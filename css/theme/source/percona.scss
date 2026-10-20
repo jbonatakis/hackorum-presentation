@@ -1,5 +1,5 @@
 /**
- * A simple theme using the Percona colors and logo
+ * A simple theme using the Percona colors
  *
  * This theme is Copyright (C) 2022 Kai Wagner, https://github.com/capri1989. It is MIT licensed.
  * reveal.js is Copyright (C) 2011-2012 Hakim El Hattab, http://hakim.se
@@ -33,11 +33,10 @@ $selectionBackgroundColor: rgba(0, 0, 0, 0.99);
 @import "../template/theme";
 // ---------------------------------------------
 
-// Add persistent corner graphics to all slides:
-// Hackorum QR top-right so the audience can open it at any point, logo bottom-right
+// Keep the Hackorum QR top-right so the audience can open it at any point.
 .reveal-viewport {
-    background-image: url(../../img/hackorum-qrcode.png), url(../../img/logo.png);
-    background-size: 6%, 10%;
-    background-repeat: no-repeat, no-repeat;
-    background-position: 96% 4%, 96% 96%;
+    background-image: url(../../img/hackorum-qrcode.png);
+    background-size: 6%;
+    background-repeat: no-repeat;
+    background-position: 96% 4%;
 }

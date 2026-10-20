@@ -59,6 +59,40 @@
   text-align: left;
 }
 
+.reveal img.screenshot-shadow {
+  border-radius: 8px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.16);
+}
+
+.summary-placeholder {
+  box-sizing: border-box;
+  min-height: 420px;
+  padding: 40px;
+  border: 3px dashed #653df4;
+  border-radius: 10px;
+  background: rgba(101, 61, 244, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  font-size: 0.85em;
+}
+
+.summary-placeholder span {
+  color: #6b6b75;
+  font-size: 0.8em;
+}
+
+.summary-example > * {
+  flex: 1;
+  min-width: 0;
+}
+
+.summary-example ul {
+  font-size: 0.9em;
+}
+
 .table {
   font-size: 0.7em;
 }
@@ -75,338 +109,252 @@
   vertical-align: top;
   word-break: break-word;
 }
+
+.incident-stats {
+  display: flex;
+  justify-content: center;
+  gap: 130px;
+  margin: 55px 0;
+}
+.incident-stats > div {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.incident-stats strong {
+  color: #653df4;
+  font-size: 2.8em;
+}
+.incident-stats span {
+  font-size: 0.7em;
+}
 </style>
 
-<!-- .slide: class="title-slide" -->
+<!-- .slide: id="start" class="title-slide" -->
 
 ## Finally a Postgres<br>Communication Hub
 
 ### for Experts and Newcomers
 
-Making 30 years of mailing list actually usable.
+From an overflowing database to an overflowing inbox.
 
-<p class="speakers">Jack Bonatakis <span class="org">Robin</span> &nbsp;&middot;&nbsp; Kai Wagner <span class="org">Percona</span></p>
-<p class="venue">PGConf.EU 2026 &middot; Valencia &middot; October 22nd &middot; Audit 2</p>
+<p class="speakers">Jack Bonatakis <span class="org">Robin</span></p>
+<p class="venue">PGConf.EU 2026 · Valencia · October 22nd · Audit 2</p>
 
 Note:
 
-* Good morning Valencia.
-* Who here is subscribed to pgsql-hackers?
-* Keep your hand up if your inbox is at zero.
-* Keep it up if you have read every message from last week.
-* That last one is the talk. Nobody's hand is up. That is not a personal failing, it is a structural one.
+* **Opening and Robin story: seven minutes through “The next morning”.** Good morning. I'm Jack. This started for me with a problem in our database at Robin, and eventually became a problem in my inbox.
+* Who here uses Postgres in their day job? And who follows its development on the mailing lists? Pause for the hands; don't assume what the room will do.
+* I want to show how I got from one to the other, why we joined forces, and what we're working on to make those conversations easier to follow.
 ---
 
-## Follow along on your own device
+## I'm Jack
 
-<img src="img/qr-slides.png" alt="QR code linking to these slides" style="height:640px; width:auto; background:none; border:none; box-shadow:none;">
-
-<p class="venue">imthekai.github.io/pgconfeu-2026-valencia-hackorum</p>
+* **Principal Engineer at Robin**
+* A Postgres user who got curious about how it gets built
+* Built **pginbox**, then joined the **Hackorum** team
 
 Note:
 
-* If the screen is hard to read from where you sit, scan this and follow the slides on your phone or laptop.
-* The same link stays up after the talk.
+* I came to this as someone using Postgres to build a product. I wanted to understand more about what was happening underneath it.
+* I'm still learning my way around the development community. That's the perspective I'm bringing today.
+* Kai was originally going to present with me and couldn't make it. I'll introduce his and Zsolt's part in the story shortly.
+* First, the problem at Robin that sent me looking.
 ---
 
-## Who are we?
+## It started with a database problem
 
-* **Kai Wagner** - Senior Engineering Manager at Percona
-    * I "bleed" open and have worked with and in Open Source for about 17y now
-    * I worked on a variety of open source projects, including Ceph and the Linux Kernel at SUSE
-    * I'm a licensed handball coach for over 20y as well as an agility and movement coach for kids
-* **Jack Bonatakis** - Principal Engineer at Robin
-    * Definitely not a Postgres hacker
-    * Interested in open source development, but new and overwhelmed 🤯
-    * Built pginbox, then joined forces with Hackorum
+<div class="incident-stats">
+  <div><strong>Terabytes</strong><span>of added storage — all WAL</span></div>
+</div>
 
-> Two companies, one project.
-> We are the people who got lost in the mailing lists and decided to build a map.
+* The system was running inefficiently
+* Storage kept growing
+* We hadn't yet found what was holding it there
 
 Note:
 
-* **Kai:** I am not a Postgres hacker by trade. I came from Ceph and the Linux kernel, and I have been doing open source for about seventeen years.
-* I remember exactly what it felt like to be confused by this project, because I was confused by it not long ago.
-* Two companies, one side project. Jack is at Robin, I am at Percona, and this is not a Percona product.
-* And yes, I am a handball coach. Twenty years of getting beginners good enough to play with the good players. That is the same problem.
-* **Handoff to Jack:** We arrived at this project separately. Jack, tell them how you got here.
+* Our system at Robin was running very inefficiently, and Cloud SQL kept automatically adding storage.
+* We had added terabytes of storage for retained WAL: PostgreSQL's write-ahead log.
+* At that point we didn't know about the replication slots that turned out to be behind it.
+* **Delivery:** Keep the incident and its resolution to about two minutes on this slide. Leave exact capacity and percentages out of the presentation.
+* Replication slots keep track of data a consumer may still need. They can cause PostgreSQL to retain WAL while waiting for that consumer.
+* I eventually found stale slots we hadn't known about. Dropping those slots resolved the problems we were seeing.
+* The storage aftermath remained. Cloud SQL had automatically grown the disk, and resolving the WAL retention didn't automatically reduce that provisioned capacity.
+* This is the account of our incident, not a recommendation to drop arbitrary slots. I don't need to take the audience through SQL commands here.
+* The investigation got me curious about how Postgres works and how it gets developed.
+* **Technical reference:** [PostgreSQL replication slots and WAL retention](https://www.postgresql.org/docs/current/warm-standby.html#STREAMING-REPLICATION-SLOTS).
+* **Wording reference:** [Cloud SQL automatic storage increases](https://docs.cloud.google.com/sql/docs/postgres/instance-settings). Keep the claim about automatic shrinking and our incident: Google also documents a separate [storage shrink operation](https://docs.cloud.google.com/sql/docs/postgres/shrink-instance-storage-capacity).
 ---
 
-## How did I end up here?
+## That curiosity led to the mailing lists
 
-* A problem at **Robin** sent me under the hood of Postgres
-* Got curious. Subscribed to a few mailing lists.
-* Woke up the next day to **hundreds of emails**
-* "I can build a tool to fix this." Enter **pginbox**.
-* Meanwhile, **Kai and Zsolt** were tackling the same problem with **Hackorum**
+* I wanted to understand more about Postgres
+* That led me to the conversations where development happens
+* So I subscribed to a few mailing lists
 
-> My inbox problem turned out to be a community problem.
+> It seemed like a reasonable next step.
 
 Note:
 
-* **Jack (~90 seconds):** So why are you all here listening to someone who just told you he's definitely not a Postgres hacker?
-* I was solving a problem at Robin that forced me to peek under the hood of our Postgres database. That got me curious about how Postgres itself gets built.
-* So I naively subscribed to a few of the mailing lists. I woke up the next day with literally hundreds of emails in my inbox.
-* Like any good hacker, my first thought was: "I can build a tool to fix this experience." Apparently "not a Postgres hacker" still leaves plenty of room to build another web app.
-* That became pginbox. I wanted a way to follow these conversations without drowning in my own inbox.
-* I had no idea Hackorum was already in the works, or that the same idea had come up at PGConf.dev 2025. I was solving a problem for myself while Kai and Zsolt were independently working on the same thing.
-* My inbox problem was a community problem. Then Kai, Zsolt and I got on a call.
+* Following that investigation, I wanted to understand more about the database we depended on and the people developing it.
+* That led me to the Postgres mailing lists. I subscribed because I wanted to learn from those conversations.
+* I wasn't planning to build a mailing-list reader. I was trying to follow along.
+* **Keep the chronology honest:** Don't claim the lists diagnosed the Robin incident or that I posted a patch or question there; those aren't part of this story.
 ---
 
-## From pginbox to Hackorum
+## The next morning
 
-* **pginbox:** my inbox-style reader for the Postgres mailing lists
-* **Hackorum:** Kai and Zsolt's forum-style reader for pgsql-hackers
-* Built independently. Same problem, same community.
-* We got on a call and compared what we'd built and where we wanted to go
-* The decision: **sunset pginbox and build Hackorum together**
+<img src="img/mailing-list-overnight.png" alt="Jack's inbox showing technical Postgres mailing-list emails received overnight" data-preview-image style="height:560px; width:auto; background:none; border:none; box-shadow:none;">
+
+* **50+ deeply technical emails** waiting in my inbox
+* Try to understand them one by one — while more arrive
+* Or ignore them, and lose the reason I subscribed
 
 Note:
 
-* **Jack (~30 seconds):** On that call, we compared what we had built, what worked, and what we wanted to do next. We were trying to help the same people follow the same conversations.
-* It made more sense to put our effort into one project. We decided to sunset pginbox, and I joined the Hackorum team. That is why I am here presenting Hackorum with Kai today.
-* **Handoff to Kai:** And that brings us to the person who built Hackorum.
-* Background: [Two projects, one mission — Hackorum and pginbox join forces](https://percona.community/blog/2026/05/13/two-projects-one-mission-hackorum-and-pginbox-join-forces/).
+* This is the experience that made the problem concrete for me: waking up to fifty-plus deeply technical emails.
+* Each one might be interesting, but understanding it can require reading the previous messages, looking up the proposal, and figuring out what the disagreement is about.
+* Meanwhile, new emails keep arriving. I can spend my available time reading them one by one, or ignore them and fall further behind.
+* I wanted to follow Postgres development, but I didn't want every conversation to become another item to process in my inbox.
+* **Screenshot:** My actual overnight inbox. Point to the arrival times and the technical subjects to make the volume concrete.
 ---
 
-## The brain behind Hackorum
+## There has to be a better way
 
-<img src="img/hk-zsolt.png" style="height:420px; width:auto; background:none; border:none; box-shadow:none;">
+* Keep the mailing-list traffic **out of my inbox**
+* Open a conversation when I have time to follow it
+* Make the flow of messages easier to navigate
 
-* **Zsolt Parragi** - Staff Software Engineer at Percona, [`@dutow`](https://github.com/dutow)
-* It started with a question at the **PGConf.dev 2025** unconference: *why has nobody built this yet?*
-* First commit **9 December 2025** - and 279 of Hackorum's 378 commits since
-
-> He built it. I mostly filed issues and complained about CSS :-)
+> That was the reason I built pginbox.
 
 Note:
 
-* **Kai:** That is Zsolt. Credit where it is due.
-* This started at PGConf.dev 2025, in the unconference session on scaling PostgreSQL development. Zsolt asked the room why nobody had built this yet, and then spent the rest of the day talking it through with people in the hallway.
-* Then he went home and built it. He and I went back and forth on the design around November. The first commit is dated the ninth of December, but it is twelve thousand lines: the whole initial development squashed into one commit. It went public on Discord at the end of December, and he has written about three quarters of the codebase since.
-* This is his own profile, on the thing he built. Ninety-eight patches sent to the lists, ninety-five commit credits.
-* He is not a web developer who wandered in. He is a Postgres hacker who got annoyed enough to build his own tooling.
+* **Joining forces: five minutes through the project landing screen.**
+* I wanted a dedicated place for this reading. Somewhere I could go when I had the time and attention, without the messages piling up alongside my work email.
+* The conversations themselves were valuable. I wanted an easier way to follow them.
+* My response was to build a tool for it.
 ---
 
-## I joined the Postgres fun in 2022
-
-<img src="img/postgres-github-search.png" style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
-
-Note:
-
-* **Kai:** My route into this started back in 2022. Different starting point, same overflowing inbox.
-* 2022. New to Postgres. I do what every developer on Earth does in 2022. I go to GitHub.
---
-
-## Where are the issues and PRs?
-
-<img src="img/postgres-github.png" style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
-
-Note:
-
-* I find the repo. Beautiful repo, thirty years of history.
-* Zero issues. Zero pull requests.
-* For anyone who grew up on GitHub, this reads as a dead project.
-* It is of course one of the most active open source projects on the planet. The activity is just somewhere else.
---
-
-## I'm confused! How do I contribute?
-
-<img src="img/how-to-contribute.png" style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
-
-Note:
-
-* So I read the docs. And the docs are good. Honest, thorough, and they tell you exactly what to do.
-* They tell you to send an email.
---
-
-## Back to the roots! Mailing lists!
-
-<img src="img/postgres-mailinglists.png" style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
-
-Note:
-
-* Mailing lists. Fine. I am old enough to remember mailing lists. I can do mailing lists.
---
-
-## There are... 54 active lists!?
-
-<img src="img/overview-mailinglists.png" style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
-
-Note:
-
-* Fifty-four of them.
-* Which one do I subscribe to? -hackers obviously, but also -bugs? -docs? -general? -patches?
-* And what is the difference between -hackers and -patches in practice, in 2026?
-* Nobody tells you. You learn it by being wrong in public.
---
-
-## This is a joke, right?
-
-<img src="img/unread-emails.png" style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
-
-Note:
-
-* So I subscribed. To -hackers. One list.
-* This is what my mailbox looked like after a holiday.
---
-
-## The same thread, twice
+## pginbox
 
 <div class="cols">
 
-<img src="img/mailclient-thread.png" data-preview-image style="width:870px; height:auto; background:none; border:none; box-shadow:none;">
+<img src="img/pginbox-overnight.png" class="screenshot-shadow" alt="pginbox listing overnight Postgres discussions with mailing lists, activity times and message counts" data-preview-image style="height:700px; width:auto; flex-shrink:0; background:none; border:none;">
 
-<img src="img/hk-thread-compare.png" data-preview-image style="width:870px; height:auto; background:none; border:none; box-shadow:none;">
+* A dedicated reader for the Postgres mailing lists
+* The conversations I wanted to follow, outside my personal inbox
 
 </div>
 
-**504 messages. 503 of them called "Re: index prefetching". 21 people. Three years.**
-
 Note:
 
-* On the left, that thread in a mail client. On the right, the same thread in Hackorum. Same messages, same archive, same protocol.
-* These are the real senders and the real dates. Not a single invented row.
-* Five hundred and four messages. Five hundred and three of them have the identical subject line. Twenty-one people. Started June 2023, still going this morning.
-* Look at the left and tell me where the objection that changed the design is. Nobody can. The information is all there and none of it is visible.
-* On the right, the same data, with the reply structure recovered from headers that were in the mail all along.
-* If you remember one slide from this talk, remember this one.
---
-
-## Can I request a 30h workday somehow?
-
-<img src="img/large-threads.png" style="height:330px; width:auto; background:none; border:none; box-shadow:none;">
-
-<img src="img/very-large-threads.png" style="height:330px; width:auto; background:none; border:none; box-shadow:none;">
-
-Note:
-
-* It is not just volume, it is shape. Single threads with two hundred, three hundred, five hundred messages, spanning years.
-* Forking into sub-discussions that reference each other.
-* This is where most newcomers quietly stop. Not because they are not smart enough.
-* Because they cannot find the thread, and once they find it they cannot find the end of it.
+* This was pginbox. It was my attempt to make that experience work for me.
+* **With the screenshot (~90 seconds):** Point to the conversation list, activity times and message counts. The same subjects from the inbox are here, grouped as discussions. Explain how I would choose a topic to read, rather than processing every incoming message in my inbox.
+* Stick to what the screenshot actually shows. The point is the reading experience and why I built it, not a full tour of a second product.
+* While I was doing this, other people were working on the same problem.
 ---
 
-## To be clear: the lists are not the problem
+## Then I connected with Kai and Zsolt
 
-* `pgsql-hackers` - where PostgreSQL is actually built
-* `pgsql-general`, `pgsql-docs`, `pgsql-bugs`, `pgsql-patches`, `pgsql-committers`
-* **Almost 30 years of institutional knowledge** - since 1997
+* **Kai Wagner** and **Zsolt Parragi** were building **Hackorum**
+* We compared what we'd built and where we wanted to go
+* Same problem, same community
+* We decided to **sunset pginbox and build Hackorum together**
 
-> *"If it wasn't on -hackers, it didn't happen."*
-
-Note:
-
-* I need to be very clear about this. The mailing lists are not a legacy mistake. They are the heartbeat of this project.
-* Decentralised, vendor-neutral, thirty years of searchable archive, and a contributor culture that works.
-* The problem is not the protocol. The problem is that the only interface anyone ships for it is an email client.
-* And email clients were not designed to help you follow a five-hundred-message technical argument across four years.
---
-
-## The firehose, in numbers
-
-<img src="img/hk-report-monthly.png" data-preview-image style="height:600px; width:auto; background:none; border:none; box-shadow:none;">
-
-**August 2026 alone:** 3,076 messages &middot; 278 active people &middot; 364 new threads &middot; 47 newcomers
-
-> That is a message **every 14 minutes**, day and night, for a month.
-<!-- .element: class="fragment highlight-box" -->
+<p class="venue">Kai and Zsolt · Percona &nbsp; / &nbsp; Jack · Robin</p>
 
 Note:
 
-* This is Hackorum's own monthly report. One month. Three thousand messages. Two hundred and seventy-eight people.
-* That is a message every fourteen minutes, around the clock, including while you sleep. Nobody reads that.
-* And the number I care about most, forty-seven people who had never posted before.
-* Forty-seven newcomers a month is a healthy community.
-* The question is how many of those forty-seven are still here in six months.
---
-
-## Where it actually hurts
-
-* **Context switching**: patch discussion &harr; commitfest &harr; CI &harr; git log
-<!-- .element: class="fragment" -->
-* **Lost threads**: *"where was that discussion about logical replication locking?"*
-<!-- .element: class="fragment" -->
-* **Barrier to entry**: newcomers don't know where to start - or whether anyone read their patch
-<!-- .element: class="fragment" -->
-* **No collaboration layer**: teams can't annotate, tag, or track threads together
-<!-- .element: class="fragment" -->
-* **Search**: keyword-only, no boolean logic, no "show me patches nobody replied to"
-<!-- .element: class="fragment" -->
-
-Note:
-
-* To review one patch today you need the thread in your mail client, the commitfest entry in a browser tab, the CI result in a third tab, and a local checkout to apply it.
-* Four systems, zero links between them. Four opportunities to give up.
-* And there is no collaboration layer at all. If you and a colleague both want to track the same patch, your only option is forwarding each other emails.
---
-
-## Why we can't just replace email
-
-* **Decentralised by design** - no corporate single point of failure
-* **~30 years of archive** that must keep working
-* **Neutral ground** - no vendor walled garden
-* **An established contributor culture** with real expectations
-
-> The goal: **evolve the interface, not the protocol.**
-> Email stays the source of truth. Hackorum is the lens.
-<!-- .element: class="fragment highlight-box" -->
-
-Note:
-
-* Every few years somebody proposes moving Postgres to GitHub, or GitLab, or Discourse.
-* Every time the answer is no, and the answer is correct, for the reasons on this slide.
-* So we did not build a replacement. We built a lens.
-* Every message in Hackorum is a real message on a real mailing list.
-* If Hackorum disappears tomorrow, the archive is untouched and everybody's workflow still works. We are strictly additive.
-* Email stays the source of truth. Hackorum is the lens.
+* I hadn't known they were already working on the same problem. Kai, Zsolt and I got on a call and compared the projects.
+* We were trying to help the same people follow the same conversations. It made sense to put our effort into one project.
+* We decided to sunset pginbox, and I joined their team.
+* Credit to Kai and Zsolt for the work that was already there, especially Zsolt for building the reader. I'm presenting work from the team today; the summaries later in the talk are the part I'm currently building.
+* **Reference, not spoken:** [The projects join forces](https://percona.community/blog/2026/05/13/two-projects-one-mission-hackorum-and-pginbox-join-forces/).
 ---
 
-# Hackorum
+<!-- .slide: id="hackorum" -->
 
-<img src="img/hk-landing.png" data-preview-image style="height:760px; width:auto; background:none; border:none; box-shadow:none;">
+## Hackorum
 
-<a href="https://hackorum.dev">hackorum.dev</a>
+<img src="img/hk-landing.png" data-preview-image style="height:690px; width:auto; background:none; border:none; box-shadow:none;">
 
-Note:
-
-* This is it. A forum-style interface on top of the PostgreSQL mailing lists.
-* The list you are looking at is a list of conversations, not messages. One mailing list thread is one topic.
-* The icons under each title are state. Has a patch, has CI, has a note, partially read.
-* On the left, six mailing lists. Hackers, patches, bugs, docs, general and committers.
-* And at the bottom left, saved searches. Remember "Patch, no replies". It comes back, and it is my favourite thing in the product.
---
-
-## What Hackorum gives you
-
-* **Read** - threads as conversations, a branch outline, per-message read state
-* **Find** - a real query language, saved searches, 30 years of archive
-* **Track** - commitfest status, patchset versions, reviewers, commits, back-ports
-* **Test** - CI on every patch, and a Docker image to try one in 90 seconds
-* **Collaborate** - teams, shared notes, `@mentions` and `#tags`
-* **Reply** - send to the list from the UI, with correct headers
-* **Measure** - contributor profiles, weekly reports, 29 years of statistics
-
-> Six mailing lists. One account. Your mail client keeps working.
+[hackorum.dev](https://hackorum.dev)
 
 Note:
 
-* Everything on this list is built on top of real mailing list messages, and none of it asks the project to change anything.
-* Six mailing lists, one account, and your mail client keeps working exactly as it does today.
---
+* **Delivery cue: the project name is spoken only here. The title and URL remain on screen.**
+* And that brings me to Hackorum.
+* It's a conversation-oriented interface to the Postgres mailing lists.
+* The mailing-list discussions are still the underlying conversations. The reader gives you a place to browse and follow them.
+* Point to the list of topics. Each row is a conversation, with information about its activity and state.
+* Let me show a short path through it from two perspectives: using Postgres and contributing to Postgres.
+---
 
-## One thread = one Topic
+<!-- .slide: id="walkthrough" -->
 
-<img src="img/hk-thread.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+## Two ways into the same conversation
+
+<div class="cols summary-example">
+
+<div>
+
+### I use Postgres
+
+* Find a relevant discussion
+* Understand its context
+* Keep up without filling my inbox
+
+</div>
+
+<div>
+
+### I contribute to Postgres
+
+* Find work that needs attention
+* Follow patches and test results
+* Try a change and join the discussion
+
+</div>
+
+</div>
 
 Note:
 
-* Open a topic and you get everything about that conversation in one place.
-* Down the left rail: CI status. The commitfest entry with its state, here "waiting on author", and its tags. The named reviewers. The participants, with their contributor tier as a small badge. The attachments, including a one-click download of the latest patchset.
-* You did not open four tabs. You opened one page.
---
+* **Walkthrough: twelve minutes across this section; about six per perspective.**
+* These overlap. Someone using Postgres may have exactly the test case or operational experience a contributor needs.
+* First I'll look at it as a user trying to understand a conversation. Then I'll follow the tools that help someone contribute.
+* Use the existing screenshots as the reliable walkthrough. A live view is optional; don't spend the whole slot touring menus.
+---
 
-## The shape of a 501-message argument
+## Find a conversation worth following
+
+<img src="img/hk-search.png" data-preview-image style="height:620px; width:auto; background:none; border:none; box-shadow:none;">
+
+* Search for a subject, person, or patch
+* Narrow the results and save a useful search
+
+Note:
+
+* **User path, step 1:** Start with something you care about. It might be a feature you depend on or a change you want to understand.
+* This screenshot shows the search interface. Point out the filters and a result; explain how they help narrow the reading.
+* The advanced query syntax is in backup if somebody wants the details. The goal in this walkthrough is to find a relevant conversation.
+* Open the index-prefetching example next. It's an existing example in this deck, not the thread that diagnosed the Robin incident.
+---
+
+## Read it as a conversation
+
+<img src="img/hk-thread.png" data-preview-image style="height:700px; width:auto; background:none; border:none; box-shadow:none;">
+
+Note:
+
+* **User path, step 2:** Here is a topic. The discussion and its related information are together on one page.
+* Start with the title and the messages. This is the actual conversation people had on the mailing list.
+* The screenshot is of index prefetching, a long-running discussion. I don't need to be an expert on that patch to see the reading problem: there's a lot of history here.
+* The sidebar also contains patch and review information. I'll return to that from the contributor perspective.
+---
+
+## Follow the branches of the discussion
 
 <div class="cols">
 
@@ -420,17 +368,13 @@ Note:
 
 Note:
 
-* This is the answer to "five hundred messages, where do I start". Zsolt still wants to rework this view, and he is probably right, but even in this state it shows the difference.
-* Email is flat and chronological. Technical arguments are not. They branch.
-* Somebody objects at message four, three people argue about it for fifteen messages, and meanwhile the main line carries on.
-* The thread outline reconstructs that shape from the In-Reply-To headers, colour-codes each branch, and lets you collapse the ones you do not care about.
-* The thread on screen is index prefetching. Five hundred and four messages, started June 2023.
-* If you read one message a minute and never stopped, that thread is a full working day. Eight and a half hours.
-* The latest patchset is plus seven and a half thousand lines, minus two thousand eight hundred.
-* Try following that in Thunderbird.
---
+* **User path, step 3:** Long discussions split. An objection can produce its own branch while other parts of the conversation continue.
+* The outline reconstructs those reply relationships. Point to one branch and show where its messages sit.
+* This gives me a way to focus my reading and return to the main conversation, rather than treating every message as an unrelated email.
+* It still takes reading to understand the argument. Remember that distinction; it is what the summary work later in the talk addresses.
+---
 
-## Read state that survives closing your laptop
+## Come back when you have time
 
 * **Per-message** read tracking - not per-thread
 * Come back in three weeks, pick up at exactly the right message
@@ -440,58 +384,31 @@ Note:
 
 Note:
 
-* Small feature, enormous difference.
-* It is what turns "I'll catch up on -hackers this weekend" from a fantasy into a plan.
-* Per-message, not per-thread, is the key detail. On a five-hundred-message thread, unread as a yes-or-no is useless.
-* And you can ignore a thread entirely. Sometimes the healthiest thing you can do for a mailing list relationship is to mute one argument. No judgement.
---
+* **User path, step 4:** Being able to leave is part of a useful reading experience.
+* Per-message read state means I can come back to where I stopped in a long thread. I can jump to unread messages or ignore a topic I no longer want to follow.
+* That gets back to why I built pginbox: I want to choose when to read these discussions, without a queue growing in my personal inbox.
+* Now change perspectives. Suppose I've found something I can help with.
+---
 
-## Search that is actually a query language
+## Find a place to contribute
 
-<img src="img/hk-search.png" data-preview-image style="height:600px; width:auto; background:none; border:none; box-shadow:none;">
-
-```
-from:andres[messages:>=10] has:patch
-```
-
-Note:
-
-* Boolean logic, field selectors, and the part worth showing off, dependent conditions.
-* "from:andres messages:>=10" means Andres posted here, and the thread has ten or more messages from anyone.
-* "from:andres[messages:>=10]", with the brackets, means Andres specifically posted ten or more messages. Entirely different question, and it is the one you actually wanted to ask.
-* You can also ask for has:patch, unread:me, starred:me, notes:me, from:committer, commitfest by status, tags from your team, anything after a date.
-* And you can save any of them.
---
-
-## My favourite screen in the whole product
-
-```
+```text
 has:patch messages:1 first_after:6m
 ```
 
-<img src="img/hk-newcomer.png" data-preview-image style="height:490px; width:auto; background:none; border:none; box-shadow:none;">
+<img src="img/hk-newcomer.png" data-preview-image style="height:530px; width:auto; background:none; border:none; box-shadow:none;">
 
-> **124** of the **1,450** patch threads started in the last six months have never had a reply &mdash; **one in twelve**.
-> All time: **1,279**.
-<!-- .element: class="fragment warning-box" -->
+* Patch threads with no replies: a concrete place to look
 
 Note:
 
-* Who here has sent a patch to this list and never heard anything back?
-* This is that list.
-* The query says: every thread from the last six months with a patch and exactly one message.
-* One message means nobody replied. Not nobody merged it. Nobody said anything at all.
-* ZSTD TOAST compression. Halve peak memory allocation for toast_flatten_tuple. Honor LC_NUMERIC on Windows.
-* Somebody wrote each of those. Tested it, formatted a patch, wrote a cover letter, sent it to a mailing list, and then refreshed their inbox for a week.
-* This is nobody's fault. Reviewer time is the scarcest resource this project has.
-* But until now there was no way to even see this list, and you cannot fix a queue you cannot look at.
-* One hundred and twenty-four patches in the last six months where nobody said anything at all, out of fourteen hundred and fifty. One in twelve.
-* All time, one thousand two hundred and seventy-nine. That is the standing backlog of people who were ignored.
-* We ship it as a global saved search called "Patch, no replies", and another called "No contributor or committer replies".
-* If you take one URL home from this talk, take that one.
---
+* **Contributor path, step 1:** This query looks for a patch, one message, and a thread started within the last six months.
+* One message means no reply in that thread. It gives me a specific set of conversations to look at rather than an undifferentiated inbox.
+* It doesn't tell me whether I have the expertise to review each patch, or whether discussion happened somewhere else. I still need to read and judge where I can help.
+* The screenshot is a captured example. Don't quote its counts as current measurements.
+---
 
-## Commitfest, reviewers and patchsets, inline
+## Follow the patch as it changes
 
 <div class="cols">
 
@@ -505,355 +422,207 @@ Note:
 
 Note:
 
-* The commitfest app and the mailing list have always been two halves of the same conversation that could not see each other. We sync them once a day.
-* Patchsets are the other half. A long thread might carry twenty-five versions of a patch, scattered across two years of messages.
-* We detect which messages are patch submissions, group them into versions, and show you a v1 to v25 history with diffstats.
-* You can answer "what did v12 look like" in about four seconds.
+* **Contributor path, step 2:** Once I pick a topic, I want to know which version of the patch I'm looking at and what is happening with review.
+* Show the patchset versions and the commitfest information together. A long conversation can contain several attempts at a solution.
+* Being able to see that history helps me avoid testing an old version by mistake.
+* This brings the relevant context together before I start working on the change.
 ---
 
-## It doesn't just read the lists
+## Check the build and test results
 
-### It builds, tests, links and talks back.
-
-Note:
-
-* Everything so far is Hackorum as a better reader. Find the thread, follow it, know where you left off.
-* The next few slides are the part that does work for you rather than just showing you things.
-* It builds and tests every patch. It connects commits back to the threads that produced them. And it can send your reply to the list.
---
-
-## We build and test every patch on the list
-
-<img src="img/hk-ci-dashboard.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+<img src="img/hk-ci-dashboard.png" data-preview-image style="height:700px; width:auto; background:none; border:none; box-shadow:none;">
 
 Note:
 
-* Not every commitfest submission. Every patch posted to the lists.
-* Six thousand three hundred tracked patchsets, seventeen hundred CI runs in the last twenty-four hours, twenty-two in flight right now.
-* For each patchset we work out the right base commit, apply it, build it, run the full test suite, and keep rebasing it as master moves.
-* Applies, needs rebase, base too old, tests failed. All of it visible, all of it public.
-* This is our own CI, not the project's, and it is explicitly marked beta.
-* And it does less than cfbot. We run one single Linux job per patchset; the commitfest CI runs ten different ones. It is not a replacement for cfbot. It is an experiment in what happens if a basic build and test exists for everything, not just commitfest entries.
---
+* **Contributor path, step 3:** The project also has patch CI. The dashboard shows build and test states.
+* Point to a status and explain what it tells a reader to investigate: application problems, a required rebase, or failing tests.
+* This is the project's own CI, marked beta in the existing deck. It has a different scope from the commitfest tooling; it doesn't remove the need for review.
+* The screenshot is an earlier snapshot. Avoid presenting its run counts as live activity.
+* The useful next step is getting from a conversation to something you can actually try.
+---
 
-## One command to try somebody's patch
+## Try somebody's patch
 
-```bash
-docker run --rm -p 5432:5432 ghcr.io/hackorum-dev/postgres-patch:t47973
-psql -h localhost -U postgres
-```
+<img src="img/hk-ci-banner.png" data-preview-image style="height:560px; width:auto; background:none; border:none; box-shadow:none;">
 
-**Anyone with Docker: run it now. It'll be up before I finish this slide.**
-<!-- .element: class="fragment highlight-box" -->
-
-<img src="img/hk-ci-banner.png" data-preview-image style="height:600px; width:auto; background:none; border:none; box-shadow:none;">
+* A patch build you can run
+* Bring observations back to the same discussion
 
 Note:
 
-* That is a running PostgreSQL, built from that thread's latest patch. No checkout, no toolchain, no build, no twenty minutes of your life.
-* Think about what that does to the review queue. "Could you try this?" used to cost somebody an afternoon. Now it costs ninety seconds and a Docker pull.
-* Anyone with Docker, paste that now.
-* And if you want the source, every patchset is also pushed as a branch to our Postgres fork. One git fetch puts you on exactly the tree CI built. Not a tree you hope is the same. The same one.
---
-
-## Commits and threads, finally connected
-
-<img src="img/hk-person-commits.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
-
-Note:
-
-* We parse the entire Postgres git history and link commits back to the threads that produced them.
-* Via commit trailers and Discussion links. Older commits without a proper link are simply not associated. Matching on the patch files themselves was tried, and it was too unreliable to ship.
-* So a thread now tells you this landed, here is the commit, and here are the branches it was back-patched to.
-* And a person shows their commit credits split by role. Author, committer, reviewer, reported-by, co-author.
-* That last breakdown matters, and it comes back in a few minutes.
---
-
-## Contributor profiles &amp; identity resolution
-
-<img src="img/hk-person.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
-
-Note:
-
-* Twenty-seven and a half thousand messages. Three thousand commit credits. Seventeen years.
-* And three email aliases, resolved into one person. That is the panel on the left.
-* Identity resolution is unglamorous and absolutely essential. People change jobs, change addresses, send from their phone. Without merging aliases, every statistic you compute is wrong.
-* Contributor tiers, core team, committer, major and significant contributor, are mirrored from the main postgresql.org website, and you can filter search by them.
-* And look at "patch threads that landed", seventy-one percent. That is a metric nobody had before.
---
-
-## Teams, notes, @mentions and #tags
-
-<img src="img/hk-note.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
-
-Note:
-
-* This is the collaboration layer that email does not have.
-* Teams can be private, public or open. Inside a team you get shared notes on any topic, at-mentions of people and teams, and hash-tags that become searchable.
-* Visibility is scoped properly. The author, the mentioned users, the mentioned teams. Nothing leaks.
-* The use case that sold it for us internally was simply "who on our team is reviewing what, and what did we conclude last time we looked at this".
-* That conversation used to live in Slack, disconnected from the thread. Now it lives on the thread.
---
+* **Contributor path, step 4:** The CI panel includes a command for running a Postgres image built from the patch.
+* Point to it in the screenshot. This can help someone try a change without first putting together the whole build themselves.
+* A Postgres user may have a workload or reproduction that is useful here, even if they're not ready to review the code.
+* A command example is in backup. Only demonstrate it live if I've checked the image and prepared the environment before the talk.
+---
 
 ## Reply to the list, from Hackorum
 
-<img src="img/hk-composer.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+<img src="img/hk-composer.png" data-preview-image style="height:700px; width:auto; background:none; border:none; box-shadow:none;">
 
 Note:
 
-* And here is the loop closing.
-* You can write a reply in Hackorum and send it to the mailing list. Properly. Correct In-Reply-To, correct References, reply-all recipients, Thunderbird-style selective quoting if you highlight text first.
-* It goes out through your own account with a narrowly scoped send permission.
-* It is your email, from your address, on the real list. We are not a proxy and we do not rewrite your From header.
-* There is a drafts view, a confirmation step before anything leaves, and a pending badge until we see the message come back from the list.
-* Until the list echoes it, we do not claim it was sent.
-* This took longer than everything else combined, and every hour of it went on making sure we never send something you did not mean to send.
---
-
-## Weekly and monthly community reports
-
-<img src="img/hk-report-weekly.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
-
-Note:
-
-* Automatically generated digests. Message volume, active people, new threads, newcomers, week over week.
-* Activity rankings split by type of contribution. Started a thread, replied to their own, replied to somebody else, sent a first patch, sent a follow-up patch.
-* Because "posted a hundred and thirty-nine messages" and "reviewed a hundred and thirty-nine patches" are very different things, and we should stop conflating them.
-* On the left, the most active, most diverse and longest running thread of the period.
-* A decent five-minute Monday morning read for what you missed.
---
-
-## 29 years of a mailing list, as charts
-
-<img src="img/hk-stats.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
-
-Note:
-
-* Public, no login needed. Message volume since 1997. New versus retained participants. Retention cohorts. Topic longevity.
-* Some of these exist because we were curious, not because anyone asked.
-* But a couple of them are genuinely uncomfortable to look at, the retention ones especially, and I think this community should be looking at them.
-* If you are into community metrics, come and find me afterwards. There is a whole talk in this screen alone.
---
-
-## It also works on the train
-
-<img src="img/hk-mobile.png" data-preview-image style="height:400px; width:auto; background:none; border:none; box-shadow:none;">
-<img src="img/hk-landing-dark.png" data-preview-image style="height:400px; width:auto; background:none; border:none; box-shadow:none;">
-
-Note:
-
-* Mobile, and dark mode.
-* The mobile one is not a joke feature. A lot of keeping up with -hackers happens on a phone, in a queue, at an airport.
-* If the only way to read the list is a desktop mail client, you have already lost those minutes.
-* Dark mode is here because I was asked for it approximately nine hundred times.
+* **Contributor path, step 5:** I can write a reply from the interface and send it to the mailing list.
+* Point to the composer. Your reply joins the existing mailing-list conversation.
+* The goal is a path from finding a topic, through understanding and trying it, to giving useful feedback.
+* Those are the two perspectives: keeping up as a user, and moving the work forward as a contributor. Often they're the same person.
 ---
 
-## Hackorum in 90 seconds
+<!-- .slide: id="ai-summaries" -->
 
-<video data-autoplay muted playsinline controls
-       src="img/hackorum-walkthrough.webm"
-       style="height:790px; width:auto; background:none; border:none; box-shadow:none;"></video>
+## I can navigate it. Can I catch up?
 
-<p class="venue"><a href="#/backup-slides">Backup slides</a> &middot; <a href="https://hackorum.dev">hackorum.dev</a></p>
+> “500 messages. What happened, what was decided, what is still open?”
+
+* An outline shows **where the conversation branches**
+* Read state shows **where I left off**
+* I still need **enough context to join in**
 
 Note:
 
-* 0:00 Every thread on six mailing lists, as a conversation. The icons are state. Patch, CI, notes, unread.
-* 0:12 A saved search. Every one of these has a patch and nobody has answered. Anyone can use it.
-* 0:24 One thread. Index prefetching. Five hundred and four messages over three years.
-* 0:36 The thread outline. That structure was in the mail headers all along. Nobody was showing it to you.
-* 0:48 CI on every patch, and that docker line gives you a running Postgres built from this patch.
-* 0:56 Search is a real query language. Andres, ten or more messages of his own, in threads with a patch.
-* 1:04 Shared notes on a thread, with at-mentions and hash-tags your team can search.
-* 1:12 And you can answer the list from here. Your address, correct headers, real mail.
-* 1:20 Thousands of patch builds a day.
-* 1:28 That is hackorum.dev. It is open, go and break it.
+* **AI summaries: nine minutes, including showing and discussing a real example.**
+* This is where the reading problem comes back. The interface makes the conversation easier to navigate, but I can still arrive at a topic with hundreds of messages and no idea what happened.
+* The outline gives me structure. It doesn't by itself explain the proposal, the objections, or what is unresolved.
+* That's the part I'm working on now: automatic AI topic summaries.
+* This is the transition from existing features to work running in my local environment.
 ---
 
-## So what's next?
+## In progress — AI topic summaries
 
-### This is where we stop presenting and start asking.
+<p class="venue">Running locally · Bug fixes and quality evaluation in progress</p>
 
-Note:
+<div class="summary-placeholder">
+  <strong>Screenshot: topic summary in Hackorum</strong>
+  <span>Show the real local UI with the topic title and readable summary text.</span>
+</div>
 
-* Everything up to here was what we built. Everything after this is what we are not sure about, and I mean that.
-* These are open questions, not a roadmap I am pretending to consult you about.
-* Four ideas, and the objection I already know about for each one.
-* Then on Friday we have a whole session to argue about them properly.
---
-
-## Idea 1 - AI summaries of threads
-
-> *"500 messages. What happened, what was decided, what is blocking?"*
-
-* The biggest cost of a long thread is **re-entry**
-* Summaries are cheap to regenerate as the thread grows
-
-But: a wrong summary is worse than no summary. Who is accountable when it misrepresents somebody's position?
-<!-- .element: class="fragment warning-box" -->
+* A starting point for reading the original conversation
 
 Note:
 
-* This is the one people ask for most often, and the one I am most cautious about.
-* The use case is specific. Not "read the list for me". It is "I am about to join a four-year-old thread and I need to not re-litigate something that was settled at message sixty".
-* My worry is attribution. If a summary says Tom rejected this approach, and Tom actually said something more nuanced, we have just put words in a committer's mouth at scale.
-* Any implementation has to link every claim back to a specific message number, and it has to be obviously machine-generated.
-* So the question for Friday is opt-in or default, and whether it needs to be visibly separated from human content the way the CI banner already is.
---
-
-## Idea 2 - Community contributor profiles
-
-The community is building contributor profiles right now.
-
-* Hackorum already resolves aliases and computes commit credits by role and patch-thread landing rate
-* That data belongs to the community, not to us
-
-**We should integrate, not duplicate.** What is the right interface - an API, a dump, upstreaming the computation?
-<!-- .element: class="fragment highlight-box" -->
-
-Note:
-
-* This is not a feature request, it is a governance question, which is why I want it discussed on Community Day rather than decided by us.
-* We have accidentally built a fairly rich contributor dataset. Alias resolution, commit credits split by role, and what fraction of the patch threads somebody started actually landed.
-* There is separate community-driven work on contributor profiles. The worst possible outcome is two half-good datasets that disagree with each other.
-* So what do you need from us? An API? A periodic dump? Should the computation live somewhere more neutral than a Percona-sponsored side project?
-* We already publish public database dumps. I genuinely do not know if that is the answer or the lazy version of it.
---
-
-## Idea 3 - Bug and feature tracking, from threads
-
-*The idea from PGConf.dev in Vancouver.*
-
-A thread already **is** an issue. It has a reporter, a discussion, and sometimes a fix.
-
-* We already link threads to patchsets, CI, commits and branches
-* What's missing is **state**, and the ability to ask *"what is still broken?"*
-
-The hard part isn't technical. It's: **who sets the state?**
-<!-- .element: class="fragment warning-box" -->
-
-Note:
-
-* This is the big one, and it came out of the unconference discussions in Vancouver.
-* Look at what a topic already has. A reporter, a discussion, attached patches, CI results, the commit that fixed it, and the branches it was back-ported to.
-* That is structurally an issue tracker. We are about two fields short.
-* The two fields are state and ownership, and that is exactly where it stops being a software problem.
-* If anyone can set a bug to confirmed, the states are meaningless. If only committers can, we have invented more work for the people with the least time. If we derive it automatically, we are back to the accountability problem from the AI slide.
-* I do not have an answer. I have a strong feeling the answer exists, and that it is a community decision rather than a product decision.
-* One thing I will say out loud. Nothing here should require a bug reporter to create an account anywhere. The moment reporting a Postgres bug requires a login, we have made this project worse.
---
-
-## Idea 4 - Topic grouping
-
-Big work is never one thread.
-
-* AIO. Logical replication. Incremental sort. Each is *dozens* of threads over years
-* Threads split, get renamed, get resurrected two years later
-* Today you find them by remembering that they exist
-
-What if a group of threads could be a first-class thing?
-<!-- .element: class="fragment highlight-box" -->
-
-Note:
-
-* Call it an epic, a project, a topic group. The name matters less than the idea.
-* Right now the knowledge that these fourteen threads are all the same piece of work lives in the heads of maybe four people.
-* When those people are on holiday, that work is effectively invisible to everyone else.
-* We can already do some of this automatically. Shared patch files, shared participants, commit trailers pointing at several threads.
-* The question is whether automatic grouping is good enough, or whether it needs curation, and if it is curated, by whom.
-* Same question as the bug tracker, differently dressed.
---
-
-## The questions we cannot answer alone
-
-1. **Who is allowed to set state** on anything - a bug, a patch, a group?
-<!-- .element: class="fragment" -->
-2. **Where should this data live** long-term? Who owns it?
-<!-- .element: class="fragment" -->
-3. **Opt-in or default** for anything generated - summaries, groupings, tiers?
-<!-- .element: class="fragment" -->
-4. **What must never change**, no matter how nice the UI gets?
-<!-- .element: class="fragment" -->
-
-Note:
-
-* These are the four that keep me up.
-* The fourth one is the one I would most like answered by the people in this room who have been here twenty years.
-* There are things about this project's workflow that look like friction to a newcomer and are actually load-bearing.
-* I would much rather be told which ones those are than find out by breaking one.
+* **About two minutes:** This works locally today. I'm working through bugs and trying to decide where the line of “good enough” is.
+* **Prepare:** Replace the placeholder with the real UI. If a summary of the earlier index-prefetching example is useful, use it; otherwise introduce the chosen thread plainly.
+* Explain what the topic is about, then show where the summary lives and what a reader sees.
+* Pick one useful piece of context in the actual output. Explain what it helps you understand or which part of the conversation it helps you read next.
+* Don't imply the feature is deployed, or promise behaviour that isn't present in the local build.
 ---
 
-## Community Day: Friday
+## One summary, one real discussion
 
-### A dedicated Hackorum session at the Community Events Day.
+<div class="summary-placeholder">
+  <strong>Screenshot: a readable summary excerpt</strong>
+  <span>Choose one proposal, disagreement, or open question from the actual output.</span>
+</div>
 
-**Come and argue with us.**
-
-Bug tracking &middot; contributor profiles &middot; thread grouping &middot; AI summaries &middot; governance
+* What would I understand after reading this?
+* Which original messages would I read next?
 
 Note:
 
-* Friday. Community Events Day. A session dedicated to exactly those four questions.
-* I am not asking you to come and be told things. I am asking you to come and disagree with us while it is still cheap to change our minds.
-* Right now every one of those ideas is a paragraph in a design doc. In six months one of them will be a database migration.
-* Especially if you are a committer, if you triage bugs, if you are working on contributor profiles, or if you have strong feelings about what should not change.
---
+* **About two minutes:** Stay with the same thread. Show a short excerpt at a size the room can read.
+* Give enough background to interpret it. Then walk through what this particular output gets across: the proposal, a disagreement, or something still unresolved.
+* Explain the next reading step it suggests. This is the practical value: helping me choose where to spend my attention.
+* **Prepare:** Write the example-specific explanation after selecting the screenshot. We haven't supplied an output yet, so this draft deliberately does not invent a summary or an evaluation result.
+---
 
-## Get involved
+## What counts as good enough?
+
+<div class="cols summary-example">
+
+<div class="summary-placeholder">
+  <strong>Screenshot: one claim, in context</strong>
+  <span>A summary excerpt beside the source message or messages needed to judge it.</span>
+</div>
+
+* Does it preserve **disagreement and uncertainty**?
+* Does it distinguish a **proposal from a decision**?
+* Can a reader **check it against the discussion**?
+
+</div>
+
+> What would you need to trust it to get you oriented?
+<!-- .element: class="highlight-box" -->
+
+Note:
+
+* **About three minutes, including a pause for the audience to read the example.**
+* A summary can sound convincing and still leave someone with the wrong understanding. A suggestion can turn into an apparent decision; one person's objection can sound like a community consensus.
+* **Prepare:** Put an actual summary excerpt beside the source message or messages needed to evaluate it. This can be assembled for the slide and doesn't assert that the UI already provides source links.
+* Work through one concrete judgment: what is captured accurately, what is missing, and what I would want to change. A nuanced example is enough; don't manufacture a failure.
+* These questions are my evaluation criteria, not claims that every generated summary already meets them.
+* Clearly identifying generated content and letting people verify it against the discussion matter to the reading experience.
+---
+
+## Help me judge it against a thread you know
+
+* What important context did it miss?
+* Did it represent the participants fairly?
+* Would it help someone new enter the conversation?
+
+> Bring a thread you know well. Let's compare.
+
+Note:
+
+* **About one minute:** The best feedback here comes from somebody who understands the original discussion.
+* I'm interested in whether it helps a new reader get oriented while preserving the details that matter to participants.
+* If you have a thread in mind, come find me after the talk. We can compare the output with your understanding of it.
+* That's the feature I'm actively working on. There are also broader ideas the team wants community input on.
+---
+
+<!-- .slide: id="whats-next" -->
+
+## Other directions we want to explore
+
+* **Contributor profiles:** connect community contribution data
+* **Bug and feature tracking:** follow state across a discussion
+* **Topic grouping:** connect related threads over time
+
+> Who maintains the information, and how should the community shape it?
+
+Note:
+
+* **Other directions and invitation: five minutes across this slide and the next.**
+* These are the other ideas Kai had in the original talk. They remain possibilities for discussion, not a release commitment.
+* Contributor profiles: how can the data we already collect support the community's work on recognising contributions?
+* Bug and feature tracking: a thread can contain a report, discussion and a fix. Making its state useful raises questions about who maintains it.
+* Topic grouping: a larger project can span several threads with different titles over years. Connecting them could help people understand the whole effort.
+* Give each idea a short example, then focus on the shared question: how do we make this useful without creating another queue of maintenance work for the same busy contributors?
+---
+
+## Follow a conversation. Tell us what gets in the way.
 
 * **Use it:** [hackorum.dev](https://hackorum.dev)
-* **Code:** [github.com/hackorum-dev/hackorum](https://github.com/hackorum-dev/hackorum)
-* **Issues / ideas:** [GitHub Issues](https://github.com/hackorum-dev/hackorum/issues)
-* **Chat:** [PostgreSQL Hacking Discord](https://discordapp.com/channels/1258108670710124574/1471524461374083186)
-* **Public DB dumps:** [dumps.hackorum.dev](https://dumps.hackorum.dev)
+* **Code and issues:** [github.com/hackorum-dev/hackorum](https://github.com/hackorum-dev/hackorum)
+* **AI summaries:** bring a thread you know well
+* **Community Day:** continue the discussion on Friday
 
-<img src="img/hackorum-qrcode.png" style="background:none; border:none; box-shadow:none; width:300px;">
-
-Note:
-
-* Everything is open source and on GitHub.
-* The database dumps, schema plus public data, are published so you can run your own copy or do your own analysis without asking us for anything.
-* If you only do one thing, sign in and set your read state. The whole thing gets dramatically more useful the moment it knows what you have already seen.
---
-
-## People are actually using it
-
-<img src="img/quote-david-steele.png" data-preview-image style="width:1150px; height:auto; background:none; border:none; box-shadow:none;">
-
-<img src="img/hackorum-discord.png" data-preview-image style="width:1150px; height:auto; background:none; border:none; box-shadow:none;">
-
-<img src="img/hackorum-usefulness.png" data-preview-image style="width:1700px; height:auto; background:none; border:none; box-shadow:none;">
-
-*&mdash; Andrey Borodin, on `pgsql-hackers`*
+<img src="img/hackorum-qrcode.png" data-preview-image style="height:260px; width:auto; background:none; border:none; box-shadow:none;">
 
 Note:
 
-* All three are Postgres contributors, and nobody was asked for a quote.
-* David Steele. A pinned tab in my browser, so great to be able to follow hackers without losing my mind. That is the entire value proposition in one sentence, and it is not mine.
-* Christoph Berg set up a hackorum channel on the PostgreSQL Hacking Discord when we asked him.
-* And this last one is my favourite. Andrey Borodin apologising for bumping a ten-year-old thread, who only knew it was exactly ten years old because Hackorum told him.
-* That is the whole point. The archive always had that information. Nobody could see it.
+* My route here started with stale replication slots at Robin. Understanding our database got me interested in the conversations behind it.
+* pginbox was my first attempt to make those conversations easier to follow. Now I'm working with the team on that same problem.
+* Try following a topic you care about. Tell us where the interface helps and where you still get stuck.
+* If you contribute to Postgres, I'd especially like to know whether these tools help people arrive with better context.
+* The existing plan includes a discussion about the project at Community Day on Friday. Confirm the session details before presenting; don't invent a time or room.
+* Thank you. I'm happy to take questions.
 ---
 
-# Questions?
+<!-- .slide: id="questions" -->
 
-### Find us after the talk, or online:
+## Questions?
 
-**kai.wagner@percona.com**
+### Jack Bonatakis · Robin
 
-[hackorum.dev](https://hackorum.dev) &middot; [github.com/hackorum-dev/hackorum](https://github.com/hackorum-dev/hackorum)
+[hackorum.dev](https://hackorum.dev) · [github.com/hackorum-dev/hackorum](https://github.com/hackorum-dev/hackorum)
 
-### And on **Friday** at the Community Events Day.
+> What would make it easier for you to follow or join a Postgres discussion?
 
 Note:
 
-* The question I get asked most is whether this is trying to replace the mailing lists. No, and the architecture makes it impossible. Every message is a real list message.
-* Who pays for this? Percona sponsors the development and the hosting today. That is exactly why the governance question matters, and it is a fair thing to be uncomfortable about.
-* What about the archives at postgresql.org? Untouched. We consume, we never write there.
-* Can I delete my data? There is a delete-account flow. The mailing list archive is not ours to delete from, and we are clear about that.
-* Why not just fix the commitfest app? Different problem. That tracks patches. This tracks conversations, and most conversations never become a commitfest entry.
-* Can I self-host? Yes. Docker Compose, Postgres 18, and the public dumps to seed it.
-* And on Friday, Community Events Day.
+* **Twelve minutes reserved for Q&A and timing buffer.** The prepared sections target thirty-eight minutes.
+* Answer from my own experience. For implementation details outside my work, say what I know and take the remaining question back to the team.
+* The backup slides have deeper product views and the recorded walkthrough. They are optional, not another section to present.
 ---
 
 <div id="backup-slides"></div>
@@ -908,7 +677,7 @@ Note:
 
 * Just running CI on the patches sounds like a weekend project. It is not.
 * The hard part is not building a patch. The hard part is deciding, continuously, which of six thousand patchsets are worth a runner right now, because master moves and every patchset silently rots.
-* Zsolt has been living inside this for months.
+* Credit Zsolt for this work. Detailed scheduling and infrastructure questions may need a follow-up with him.
 --
 
 ## Backup: CI statistics
@@ -937,8 +706,7 @@ Note:
 Note:
 
 * A team gets an aggregate profile. Combined messages, patches, commit credits by role, and the patch threads that landed rate.
-* For us that number is forty-three percent. For an individual committer it is seventy-one.
-* That gap is roughly what being new costs you, and it is the kind of thing this data can now make visible.
+* The figures belong to the captured team profile. Treat them as a historical snapshot; they do not by themselves establish why rates differ.
 --
 
 ## Backup: notifications
@@ -968,7 +736,7 @@ Note:
 Note:
 
 * Search syntax and account linking.
-* The search guide is worth reading even if you never use Hackorum. It is a decent taxonomy of the questions you might want to ask a mailing list.
+* The search guide is worth reading even if you never use the reader. It is a decent taxonomy of the questions you might want to ask a mailing list.
 ---
 
 ## Backup: under the hood
@@ -994,7 +762,7 @@ Note:
 
 Note:
 
-* Why Rails in 2026? Because we are not web developers, and Rails 8 out of the box gave us queues, cache, cable and websockets without adding a single piece of infrastructure.
+* This is the architecture documented in the original deck. Rails supplies the application framework, with Postgres-backed services.
 * Full-text search is Postgres. The job queue is Postgres. The cache is Postgres.
 * We run our own mail server for list ingestion rather than depending on an IMAP label in a Gmail account, which was exactly as fragile as it sounds.
 ---
@@ -1026,7 +794,7 @@ end
 
 Note:
 
-* The preview step exists because we once merged two people who were not the same person. Once was enough.
+* A preview lets an administrator inspect the proposed identity merge before committing it.
 ---
 
 ## Backup: why not just a forum?
@@ -1036,7 +804,7 @@ Note:
 | | Mailing list | Forum (Discourse) | Hackorum |
 |---|---|---|---|
 | Source of truth | Email | The forum DB | **Email** |
-| Works if it dies | n/a | Everything is lost | **Nothing is lost** |
+| If the UI disappears | Email remains | Depends on archive / backups | **Mailing-list archive remains** |
 | Offline / your client | yes | no | **yes (still email)** |
 | Threading UI | no | yes | yes |
 | Search | weak | yes | yes |
@@ -1047,6 +815,134 @@ Note:
 Note:
 
 * The row that matters is the second one.
-* If Discourse is your source of truth and Discourse goes away, thirty years of Postgres history goes with it.
-* If Hackorum goes away tomorrow, absolutely nothing happens to the archive, and everybody's mail client keeps working exactly as it did.
+* A forum stores its conversations in its own database, so preservation depends on how that service and its backups are operated.
+* If this interface goes away tomorrow, the mailing-list archive remains, and everybody's mail client keeps working exactly as it did.
 * That asymmetry is the entire design.
+---
+
+## Backup: Advanced search
+
+<img src="img/hk-search.png" data-preview-image style="height:600px; width:auto; background:none; border:none; box-shadow:none;">
+
+```
+from:andres[messages:>=10] has:patch
+```
+
+Note:
+
+* The dependent-condition example distinguishes messages from one person from the total messages in the topic.
+* Use this if someone asks about search syntax, rather than during the short walkthrough.
+---
+
+## Backup: Commits and discussions
+
+<img src="img/hk-person-commits.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+
+Note:
+
+* Show how commit information connects back to the discussion and to contributor credit.
+* The screenshot is a historical example, not a current count.
+---
+
+## Backup: Contributor profiles
+
+<img src="img/hk-person.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+
+Note:
+
+* Show the profile and multiple aliases. The figures are from the captured example.
+* Avoid inferring contribution quality from a single metric.
+---
+
+## Backup: Team notes
+
+<img src="img/hk-note.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+
+Note:
+
+* Show the note attached to the topic and the mention/tag workflow.
+* This is a place to discuss how colleagues can keep context together.
+---
+
+## Backup: Community reports
+
+<img src="img/hk-report-weekly.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+
+Note:
+
+* The reports summarise activity such as messages, topics and participants.
+* Use the period shown on the screenshot when discussing its figures.
+---
+
+## Backup: Community statistics
+
+<img src="img/hk-stats.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+
+Note:
+
+* These views let people explore activity across the archive.
+* The chart alone does not establish why participation changes.
+---
+
+## Backup: Mobile and dark mode
+
+<img src="img/hk-mobile.png" data-preview-image style="height:400px; width:auto; background:none; border:none; box-shadow:none;">
+<img src="img/hk-landing-dark.png" data-preview-image style="height:400px; width:auto; background:none; border:none; box-shadow:none;">
+
+Note:
+
+* The interface includes mobile and dark-mode views. Show these if someone asks about reading on a phone.
+---
+
+## Backup: Recorded walkthrough
+
+<video data-autoplay muted playsinline controls
+       src="img/hackorum-walkthrough.webm"
+       style="height:790px; width:auto; background:none; border:none; box-shadow:none;"></video>
+
+<p class="venue"><a href="#/backup-slides">Backup slides</a> &middot; <a href="https://hackorum.dev">hackorum.dev</a></p>
+
+Note:
+
+* Optional replacement for part of the screenshot walkthrough if useful; do not add another full tour to the scheduled talk.
+* 0:00 Every thread on six mailing lists, as a conversation. The icons are state. Patch, CI, notes, unread.
+* 0:12 A saved search. Every one of these has a patch and nobody has answered. Anyone can use it.
+* 0:24 One thread. Index prefetching. Five hundred and four messages over three years.
+* 0:36 The thread outline. That structure was in the mail headers all along. Nobody was showing it to you.
+* 0:48 CI on every patch, and that docker line gives you a running Postgres built from this patch.
+* 0:56 Search is a real query language. Andres, ten or more messages of his own, in threads with a patch.
+* 1:04 Shared notes on a thread, with at-mentions and hash-tags your team can search.
+* 1:12 And you can answer the list from here. Your address, correct headers, real mail.
+* 1:20 Thousands of patch builds a day.
+* 1:28 You can try it at the address on screen.
+---
+
+## Backup: Community feedback
+
+<img src="img/quote-david-steele.png" data-preview-image style="width:1150px; height:auto; background:none; border:none; box-shadow:none;">
+
+<img src="img/hackorum-discord.png" data-preview-image style="width:1150px; height:auto; background:none; border:none; box-shadow:none;">
+
+<img src="img/hackorum-usefulness.png" data-preview-image style="width:1700px; height:auto; background:none; border:none; box-shadow:none;">
+
+*&mdash; Andrey Borodin, on `pgsql-hackers`*
+
+Note:
+
+* These are the attributed community comments preserved from the original deck. Give the audience time to read them.
+
+---
+
+## Backup: run a patch image
+
+```bash
+docker run --rm -p 5432:5432 ghcr.io/hackorum-dev/postgres-patch:t47973
+psql -h localhost -U postgres
+```
+
+<img src="img/hk-ci-banner.png" data-preview-image style="height:480px; width:auto; background:none; border:none; box-shadow:none;">
+
+Note:
+
+* Example command preserved from the original deck for topic 47973. Check the current image and connection settings before a live demonstration.
+* This is optional reference material, not an instruction for the audience to execute during the prepared talk.
