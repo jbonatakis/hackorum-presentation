@@ -64,6 +64,20 @@
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.16);
 }
 
+.reveal img.feedback-qr {
+  width: 555px;
+  height: 555px;
+  padding: 60px;
+  background: #fff;
+  border: none;
+  box-shadow: none;
+  image-rendering: pixelated;
+}
+
+.reveal-viewport.feedback-only {
+  background-image: none;
+}
+
 .summary-placeholder {
   box-sizing: border-box;
   min-height: 420px;
@@ -608,20 +622,33 @@ Note:
 * Thank you. I'm happy to take questions.
 ---
 
-<!-- .slide: id="questions" -->
+<!-- .slide: id="questions" data-state="feedback-only" data-background-color="#ffffff" -->
 
 ## Questions?
 
+<div class="cols">
+
+<div>
+
 ### Jack Bonatakis · Robin
 
-[hackorum.dev](https://hackorum.dev) · [github.com/hackorum-dev/hackorum](https://github.com/hackorum-dev/hackorum)
+[hackorum.dev](https://hackorum.dev)
 
-> What would make it easier for you to follow or join a Postgres discussion?
+[github.com/hackorum-dev/hackorum](https://github.com/hackorum-dev/hackorum)
+
+**How was the talk? Scan to leave feedback.**
+
+</div>
+
+<img src="img/talk-feedback-qr.png" class="feedback-qr" alt="QR code for feedback on this talk">
+
+</div>
 
 Note:
 
 * **Twelve minutes reserved for Q&A and timing buffer.** The prepared sections target thirty-eight minutes.
 * Answer from my own experience. For implementation details outside my work, say what I know and take the remaining question back to the team.
+* Invite the audience to scan the QR code and leave feedback while taking questions.
 * The backup slides have deeper product views and the recorded walkthrough. They are optional, not another section to present.
 ---
 
