@@ -59,6 +59,142 @@
   text-align: left;
 }
 
+.reveal .team-intro {
+  color: #000;
+  font-weight: 400;
+}
+
+.participation-spectrum {
+  width: 90%;
+  margin: 0 auto;
+  padding: 60px 0;
+}
+
+.spectrum-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 80px;
+}
+
+.reveal .spectrum-labels h3 {
+  margin: 0;
+  font-size: 1.3em;
+  text-align: left;
+}
+
+.reveal .spectrum-labels h3:last-child {
+  text-align: right;
+}
+
+.spectrum-line {
+  position: relative;
+  height: 8px;
+  margin: 45px 15px 55px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #c4b5fd, #653df4);
+}
+
+.spectrum-line::before,
+.spectrum-line::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+}
+
+.spectrum-line::before {
+  left: -13px;
+  background: #c4b5fd;
+}
+
+.spectrum-line::after {
+  right: -13px;
+  background: #653df4;
+}
+
+.spectrum-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 100px;
+}
+
+.reveal .spectrum-details ul {
+  display: block;
+  margin: 0;
+  padding-left: 1.1em;
+  font-size: 0.82em;
+  text-align: left;
+}
+
+.spectrum-details ul:last-child {
+  justify-self: end;
+}
+
+.spectrum-details li + li {
+  margin-top: 0.4em;
+}
+
+.team-portraits {
+  display: flex;
+  justify-content: center;
+  gap: 100px;
+  margin-top: 35px;
+}
+
+.team-portraits figure {
+  margin: 0;
+  text-align: center;
+}
+
+.reveal .team-portraits img {
+  display: block;
+  width: 250px;
+  height: 250px;
+  margin: 0 auto 15px;
+  object-fit: cover;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
+}
+
+.team-portraits figcaption {
+  font-size: 0.7em;
+}
+
+.image-with-notes {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  align-items: center;
+  gap: 60px;
+}
+
+.reveal .image-with-notes > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  max-height: 620px;
+  object-fit: contain;
+  margin: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
+.reveal .image-with-notes > ul {
+  display: block;
+  margin: 0 0 0 1em;
+  text-align: left;
+}
+
+.image-with-notes li + li {
+  margin-top: 0.5em;
+}
+
 .reveal img.screenshot-shadow {
   border-radius: 8px;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.16);
@@ -150,38 +286,44 @@
 
 ### for Experts and Newcomers
 
-From an overflowing database to an overflowing inbox.
-
 <p class="speakers">Jack Bonatakis <span class="org">Robin</span></p>
 <p class="venue">PGConf.EU 2026 · Valencia · October 22nd · Audit 2</p>
 
 Note:
 
-* **Opening and Robin story: seven minutes through “The next morning”.** Good morning. I'm Jack. This started for me with a problem in our database at Robin, and eventually became a problem in my inbox.
-* Who here uses Postgres in their day job? And who follows its development on the mailing lists? Pause for the hands; don't assume what the room will do.
-* I want to show how I got from one to the other, why we joined forces, and what we're working on to make those conversations easier to follow.
+* **Opening and Robin story: seven minutes through “The next morning”.** Good morning. I'm Jack.
+* This is already a pretty long title. So I might as well make it longer.
+* **Advance to the subtitle, then pause.**
+---
+
+<!-- .slide: id="subtitle" class="title-slide" -->
+
+## Or, So you wanna be a Postgres Hacker?
+
+Note:
+
+* **About 30 seconds, within the opening allocation.** Let the subtitle land before continuing.
+* Kai was originally going to present this with me, but unfortunately he couldn't make it. So the perspective of the talk has shifted a bit.
+* I'm coming at this as someone who uses Postgres, got curious about how it's built, and wanted to find a way into those conversations.
+* That's the story I'll tell today: how I got here, what made it hard to follow along, and what we're building to make it easier.
 ---
 
 ## I'm Jack
 
 * **Principal Engineer at Robin**
-* A Postgres user who got curious about how it gets built
-* Built **pginbox**, then joined the **Hackorum** team
+* A Postgres user who got curious about how Postgres gets *built*
 
 Note:
 
 * I came to this as someone using Postgres to build a product. I wanted to understand more about what was happening underneath it.
 * I'm still learning my way around the development community. That's the perspective I'm bringing today.
-* Kai was originally going to present with me and couldn't make it. I'll introduce his and Zsolt's part in the story shortly.
+* Who here uses Postgres in their day job? And who follows its development on the mailing lists? Pause for the hands; don't assume what the room will do.
 * First, the problem at Robin that sent me looking.
 ---
 
 ## It started with a database problem
 
-<div class="incident-stats">
-  <div><strong>Terabytes</strong><span>of added storage — all WAL</span></div>
-</div>
-
+* Terabytes of added storage, all WAL
 * The system was running inefficiently
 * Storage kept growing
 * We hadn't yet found what was holding it there
@@ -219,11 +361,15 @@ Note:
 
 ## The next morning
 
-<img src="img/mailing-list-overnight.png" alt="Jack's inbox showing technical Postgres mailing-list emails received overnight" data-preview-image style="height:560px; width:auto; background:none; border:none; box-shadow:none;">
+<div class="image-with-notes">
+
+<img src="img/mailing-list-overnight.png" alt="Jack's inbox showing technical Postgres mailing-list emails received overnight" data-preview-image>
 
 * **50+ deeply technical emails** waiting in my inbox
 * Try to understand them one by one — while more arrive
 * Or ignore them, and lose the reason I subscribed
+
+</div>
 
 Note:
 
@@ -240,11 +386,9 @@ Note:
 * Open a conversation when I have time to follow it
 * Make the flow of messages easier to navigate
 
-> That was the reason I built pginbox.
-
 Note:
 
-* **Joining forces: five minutes through the project landing screen.**
+* **Joining forces: five minutes through meeting Kai and Zsolt.**
 * I wanted a dedicated place for this reading. Somewhere I could go when I had the time and attention, without the messages piling up alongside my work email.
 * The conversations themselves were valuable. I wanted an easier way to follow them.
 * My response was to build a tool for it.
@@ -271,12 +415,21 @@ Note:
 
 ## Then I connected with Kai and Zsolt
 
-* **Kai Wagner** and **Zsolt Parragi** were building **Hackorum**
+* <span class="team-intro"><strong>Kai Wagner</strong> and <strong>Zsolt Parragi</strong> were building <strong>Hackorum</strong></span>
 * We compared what we'd built and where we wanted to go
 * Same problem, same community
 * We decided to **sunset pginbox and build Hackorum together**
 
-<p class="venue">Kai and Zsolt · Percona &nbsp; / &nbsp; Jack · Robin</p>
+<div class="team-portraits">
+  <figure>
+    <img src="img/kai-wagner.jpg" alt="Kai Wagner">
+    <figcaption>Kai Wagner</figcaption>
+  </figure>
+  <figure>
+    <img src="img/zsolt-parragi.png" alt="Zsolt Parragi">
+    <figcaption>Zsolt Parragi</figcaption>
+  </figure>
+</div>
 
 Note:
 
@@ -285,6 +438,37 @@ Note:
 * We decided to sunset pginbox, and I joined their team.
 * Credit to Kai and Zsolt for the work that was already there, especially Zsolt for building the reader. I'm presenting work from the team today; the summaries later in the talk are the part I'm currently building.
 * **Reference, not spoken:** [The projects join forces](https://percona.community/blog/2026/05/13/two-projects-one-mission-hackorum-and-pginbox-join-forces/).
+* **Photo sources, not spoken:** Public GitHub profile photos for [Kai](https://github.com/ImTheKai) and [Zsolt](https://github.com/dutow).
+---
+
+<!-- .slide: id="walkthrough" -->
+
+<div class="participation-spectrum" role="group" aria-label="A spectrum from using Postgres to contributing to Postgres">
+  <div class="spectrum-labels">
+    <h3>I use Postgres</h3>
+    <h3>I contribute to Postgres</h3>
+  </div>
+  <div class="spectrum-line" aria-hidden="true"></div>
+  <div class="spectrum-details">
+    <ul>
+      <li>Find a relevant discussion</li>
+      <li>Understand its context</li>
+      <li>Keep up without filling my inbox</li>
+    </ul>
+    <ul>
+      <li>Find work that needs attention</li>
+      <li>Follow patches and test results</li>
+      <li>Try a change and join the discussion</li>
+    </ul>
+  </div>
+</div>
+
+Note:
+
+* **Walkthrough: twelve minutes across this section; about six per perspective.**
+* Think of this as a spectrum. You can move along it, and you can be both a user and a contributor. Someone using Postgres may have exactly the test case or operational experience a contributor needs.
+* First I'll look at it as a user trying to understand a conversation. Then I'll follow the tools that help someone contribute.
+* Use the existing screenshots as the reliable walkthrough. A live view is optional; don't spend the whole slot touring menus.
 ---
 
 <!-- .slide: id="hackorum" -->
@@ -302,51 +486,19 @@ Note:
 * It's a conversation-oriented interface to the Postgres mailing lists.
 * The mailing-list discussions are still the underlying conversations. The reader gives you a place to browse and follow them.
 * Point to the list of topics. Each row is a conversation, with information about its activity and state.
-* Let me show a short path through it from two perspectives: using Postgres and contributing to Postgres.
----
-
-<!-- .slide: id="walkthrough" -->
-
-## Two ways into the same conversation
-
-<div class="cols summary-example">
-
-<div>
-
-### I use Postgres
-
-* Find a relevant discussion
-* Understand its context
-* Keep up without filling my inbox
-
-</div>
-
-<div>
-
-### I contribute to Postgres
-
-* Find work that needs attention
-* Follow patches and test results
-* Try a change and join the discussion
-
-</div>
-
-</div>
-
-Note:
-
-* **Walkthrough: twelve minutes across this section; about six per perspective.**
-* These overlap. Someone using Postgres may have exactly the test case or operational experience a contributor needs.
-* First I'll look at it as a user trying to understand a conversation. Then I'll follow the tools that help someone contribute.
-* Use the existing screenshots as the reliable walkthrough. A live view is optional; don't spend the whole slot touring menus.
+* Let's start with finding a discussion as a Postgres user.
 ---
 
 ## Find a conversation worth following
 
-<img src="img/hk-search.png" data-preview-image style="height:620px; width:auto; background:none; border:none; box-shadow:none;">
+<div class="image-with-notes">
+
+<img src="img/hk-search.png" data-preview-image>
 
 * Search for a subject, person, or patch
 * Narrow the results and save a useful search
+
+</div>
 
 Note:
 
@@ -394,7 +546,6 @@ Note:
 * Come back in three weeks, pick up at exactly the right message
 * "Jump to unread" &middot; "Mark all read" &middot; "Collapse all"
 * **Ignore a thread** so it stops shouting at you
-* Import your existing read state from CSV
 
 Note:
 
@@ -410,9 +561,13 @@ Note:
 has:patch messages:1 first_after:6m
 ```
 
-<img src="img/hk-newcomer.png" data-preview-image style="height:530px; width:auto; background:none; border:none; box-shadow:none;">
+<div class="image-with-notes">
+
+<img src="img/hk-newcomer.png" data-preview-image>
 
 * Patch threads with no replies: a concrete place to look
+
+</div>
 
 Note:
 
@@ -457,10 +612,14 @@ Note:
 
 ## Try somebody's patch
 
-<img src="img/hk-ci-banner.png" data-preview-image style="height:560px; width:auto; background:none; border:none; box-shadow:none;">
+<div class="image-with-notes">
+
+<img src="img/hk-ci-banner.png" data-preview-image>
 
 * A patch build you can run
 * Bring observations back to the same discussion
+
+</div>
 
 Note:
 

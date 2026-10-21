@@ -28,13 +28,16 @@ For a checkout without dependencies, use `npm ci` first. Add `?print-pdf` for PD
 
 | Section | Slides | Minutes | Elapsed target |
 |---|---|---:|---:|
-| Introduction → Robin incident → mailing lists → overnight inbox | 1–5 | 7 | 7 |
-| “There has to be a better way” → pginbox → joining Kai and Zsolt → Hackorum | 6–9 | 5 | 12 |
-| Brief walkthrough: Postgres users and contributors | 10–19 | 12 | 24 |
-| AI topic summaries: local UI, output, and “good enough” | 20–24 | 9 | 33 |
-| Other possible features and invitation to participate | 25–26 | 5 | 38 |
-| Q&A and timing buffer | 27 | 12 | 50 |
-| Backup material | 28–51 | As needed | — |
+| Title + subtitle → introduction → Robin incident → mailing lists → overnight inbox | 1–6 | 7 | 7 |
+| “There has to be a better way” → pginbox → joining Kai and Zsolt | 7–9 | 5 | 12 |
+| Two perspectives → project reveal → walkthrough | 10–20 | 12 | 24 |
+| AI topic summaries: local UI, output, and “good enough” | 21–25 | 9 | 33 |
+| Other possible features and invitation to participate | 26–27 | 5 | 38 |
+| Q&A and timing buffer | 28 | 12 | 50 |
+| Backup material | 29–52 | As needed | — |
+
+The subtitle follows the long-title joke and introduces Kai's absence and Jack's
+perspective. Allow about 30 seconds within the existing opening allocation.
 
 The prepared talk targets **38 minutes**, leaving **12 minutes for questions and
 timing variation**. These are rehearsal budgets, not measured speaking durations.
