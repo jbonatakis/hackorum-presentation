@@ -217,10 +217,11 @@
 
 .reveal .image-with-notes > img {
   display: block;
-  width: 100%;
+  width: auto;
   height: auto;
   max-width: 100%;
   max-height: 620px;
+  justify-self: center;
   object-fit: contain;
   margin: 0;
   background: none;
@@ -289,8 +290,6 @@
   max-height: 580px;
   margin: 30px auto;
   border: none;
-  border-radius: 8px;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.16);
 }
 
 .reveal img.summary-excerpt {
@@ -416,7 +415,7 @@ Note:
 * That led me to the conversations where development happens
 * So I subscribed to a few mailing lists
 
-> It seemed like a reasonable next step.
+<p style="margin-top:45px;"><em>It seemed like a reasonable next step…</em></p>
 
 Note:
 
@@ -430,7 +429,7 @@ Note:
 
 <div class="image-with-notes">
 
-<img src="img/mailing-list-overnight.png" alt="Jack's inbox showing technical Postgres mailing-list emails received overnight" data-preview-image>
+<img class="screenshot-shadow" src="img/mailing-list-overnight.png" alt="Jack's inbox showing technical Postgres mailing-list emails received overnight" data-preview-image>
 
 * **50+ deeply technical emails** waiting in my inbox
 * Try to understand them one by one, while more arrive
@@ -542,7 +541,7 @@ Note:
 
 ## Hackorum
 
-<img src="img/hk-landing.png" data-preview-image style="height:690px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-landing.png" data-preview-image style="height:690px; width:auto; background:none; border:none;">
 
 [hackorum.dev](https://hackorum.dev)
 
@@ -567,7 +566,7 @@ Note:
 
 <div class="image-with-notes">
 
-<img src="img/hk-search.png" data-preview-image>
+<img class="screenshot-shadow" src="img/hk-search.png" data-preview-image>
 
 * Search for a subject, person, or patch
 * Narrow the results and save a useful search
@@ -591,7 +590,7 @@ Note:
 
 ## Read it as a conversation
 
-<img src="img/hk-thread.png" data-preview-image style="height:700px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-thread.png" data-preview-image style="height:700px; width:auto; background:none; border:none;">
 
 Note:
 
@@ -612,7 +611,7 @@ Note:
 
 <div class="cols">
 
-<img src="img/hk-thread-outline.png" data-preview-image style="height:600px; width:auto; flex-shrink:0; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-thread-outline.png" data-preview-image style="height:600px; width:auto; flex-shrink:0; background:none; border:none;">
 
 * Colour-coded reply branches, reconstructed from `In-Reply-To`
 * *"#5...#20 to Tomas Vondra (#1)"* - a sub-debate you can read or skip as a unit
@@ -665,7 +664,7 @@ has:patch messages:1 first_after:6m
 
 <div class="image-with-notes">
 
-<img src="img/hk-newcomer.png" data-preview-image>
+<img class="screenshot-shadow" src="img/hk-newcomer.png" data-preview-image>
 
 * Patch threads with no replies: a concrete place to look
 
@@ -690,7 +689,7 @@ Note:
 
 <div class="cols">
 
-<img src="img/hk-patchsets.png" data-preview-image style="height:600px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-patchsets.png" data-preview-image style="height:600px; width:auto; background:none; border:none;">
 
 * **Daily** sync with **commitfest.postgresql.org**, status inline
 * Commitfest tags, reviewer and committer attribution
@@ -715,7 +714,7 @@ Note:
 
 ## Check the build and test results
 
-<img src="img/hk-ci-dashboard.png" data-preview-image style="height:700px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-ci-dashboard.png" data-preview-image style="height:700px; width:auto; background:none; border:none;">
 
 Note:
 
@@ -737,7 +736,7 @@ Note:
 
 <div class="image-with-notes">
 
-<img src="img/hk-ci-banner.png" data-preview-image>
+<img class="screenshot-shadow" src="img/hackorum-build.png" alt="Hackorum patch CI panel with Docker and Git commands for trying a patch build" data-preview-image>
 
 * A patch build you can run
 * Bring observations back to the same discussion
@@ -761,7 +760,7 @@ Note:
 
 ## Reply to the list, from Hackorum
 
-<img src="img/hk-composer.png" data-preview-image style="height:700px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-composer.png" data-preview-image style="height:700px; width:auto; background:none; border:none;">
 
 Note:
 
@@ -796,7 +795,7 @@ Note:
 
 <p style="font-size:0.7em;"><strong>Topic:</strong> <a href="https://hackorum.dev/topics/52309" target="_blank" rel="noopener noreferrer">Introduce XID age based replication slot invalidation</a></p>
 
-<img class="summary-screenshot summary-full" src="img/hackorum-summary.png" alt="AI topic summary of a discussion about invalidating stale replication slots, with message references" data-preview-image>
+<img class="screenshot-shadow summary-screenshot summary-full" src="img/hackorum-summary.png" alt="AI topic summary of a discussion about invalidating stale replication slots, with message references" data-preview-image>
 
 Note:
 
@@ -809,7 +808,7 @@ Note:
 
 ## One summary, one real discussion
 
-<img class="summary-screenshot summary-excerpt" src="img/overview.png" alt="Summary overview describing the replication-slot invalidation proposal and its revisions, with references to original messages" data-preview-image>
+<img class="screenshot-shadow summary-screenshot summary-excerpt" src="img/overview.png" alt="Summary overview describing the replication-slot invalidation proposal and its revisions, with references to original messages" data-preview-image>
 
 Note:
 
@@ -821,7 +820,7 @@ Note:
 
 ## Did we get it right?
 
-<img class="summary-screenshot summary-excerpt" src="img/concern.png" alt="Summary excerpt describing a concern about choosing an XID-based cutoff, with references to messages 19 and 20" data-preview-image>
+<img class="screenshot-shadow summary-screenshot summary-excerpt" src="img/concern.png" alt="Summary excerpt describing a concern about choosing an XID-based cutoff, with references to messages 19 and 20" data-preview-image>
 
 * Does it preserve **disagreement and uncertainty**?
 * Does it distinguish a **proposal from a decision**?
@@ -941,7 +940,7 @@ Note:
 
 ## Backup: the topic index, in detail
 
-<img src="img/hk-landing.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-landing.png" data-preview-image style="height:800px; width:auto; background:none; border:none;">
 
 Note:
 
@@ -951,7 +950,7 @@ Note:
 
 ## Backup: a thread, in detail
 
-<img src="img/hk-thread-big.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-thread-big.png" data-preview-image style="height:800px; width:auto; background:none; border:none;">
 
 Note:
 
@@ -961,7 +960,7 @@ Note:
 
 ## Backup: per-topic CI history
 
-<img src="img/hk-ci-topic.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-ci-topic.png" data-preview-image style="height:800px; width:auto; background:none; border:none;">
 
 Note:
 
@@ -987,7 +986,7 @@ Note:
 
 ## Backup: CI statistics
 
-<img src="img/hk-ci-stats.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-ci-stats.png" data-preview-image style="height:800px; width:auto; background:none; border:none;">
 
 Note:
 
@@ -997,7 +996,7 @@ Note:
 
 ## Backup: teams
 
-<img src="img/hk-teams-settings.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-teams-settings.png" data-preview-image style="height:800px; width:auto; background:none; border:none;">
 
 Note:
 
@@ -1006,7 +1005,7 @@ Note:
 
 ## Backup: a team profile
 
-<img src="img/hk-team.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-team.png" data-preview-image style="height:800px; width:auto; background:none; border:none;">
 
 Note:
 
@@ -1016,7 +1015,7 @@ Note:
 
 ## Backup: notifications
 
-<img src="img/hk-activities.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-activities.png" data-preview-image style="height:800px; width:auto; background:none; border:none;">
 
 Note:
 
@@ -1025,7 +1024,7 @@ Note:
 
 ## Backup: drafts and sent mail
 
-<img src="img/hk-drafts.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-drafts.png" data-preview-image style="height:800px; width:auto; background:none; border:none;">
 
 Note:
 
@@ -1036,7 +1035,7 @@ Note:
 
 ## Backup: the help pages
 
-<img src="img/hk-help.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-help.png" data-preview-image style="height:800px; width:auto; background:none; border:none;">
 
 Note:
 
@@ -1127,7 +1126,7 @@ Note:
 
 ## Backup: Advanced search
 
-<img src="img/hk-search.png" data-preview-image style="height:600px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-search.png" data-preview-image style="height:600px; width:auto; background:none; border:none;">
 
 ```
 from:andres[messages:>=10] has:patch
@@ -1141,7 +1140,7 @@ Note:
 
 ## Backup: Commits and discussions
 
-<img src="img/hk-person-commits.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-person-commits.png" data-preview-image style="height:800px; width:auto; background:none; border:none;">
 
 Note:
 
@@ -1151,7 +1150,7 @@ Note:
 
 ## Backup: Contributor profiles
 
-<img src="img/hk-person.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-person.png" data-preview-image style="height:800px; width:auto; background:none; border:none;">
 
 Note:
 
@@ -1161,7 +1160,7 @@ Note:
 
 ## Backup: Team notes
 
-<img src="img/hk-note.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-note.png" data-preview-image style="height:800px; width:auto; background:none; border:none;">
 
 Note:
 
@@ -1171,7 +1170,7 @@ Note:
 
 ## Backup: Community reports
 
-<img src="img/hk-report-weekly.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-report-weekly.png" data-preview-image style="height:800px; width:auto; background:none; border:none;">
 
 Note:
 
@@ -1181,7 +1180,7 @@ Note:
 
 ## Backup: Community statistics
 
-<img src="img/hk-stats.png" data-preview-image style="height:800px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-stats.png" data-preview-image style="height:800px; width:auto; background:none; border:none;">
 
 Note:
 
@@ -1191,8 +1190,8 @@ Note:
 
 ## Backup: Mobile and dark mode
 
-<img src="img/hk-mobile.png" data-preview-image style="height:400px; width:auto; background:none; border:none; box-shadow:none;">
-<img src="img/hk-landing-dark.png" data-preview-image style="height:400px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-mobile.png" data-preview-image style="height:400px; width:auto; background:none; border:none;">
+<img class="screenshot-shadow" src="img/hk-landing-dark.png" data-preview-image style="height:400px; width:auto; background:none; border:none;">
 
 Note:
 
@@ -1224,11 +1223,11 @@ Note:
 
 ## Backup: Community feedback
 
-<img src="img/quote-david-steele.png" data-preview-image style="width:1150px; height:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/quote-david-steele.png" data-preview-image style="width:1150px; height:auto; background:none; border:none;">
 
-<img src="img/hackorum-discord.png" data-preview-image style="width:1150px; height:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hackorum-discord.png" data-preview-image style="width:1150px; height:auto; background:none; border:none;">
 
-<img src="img/hackorum-usefulness.png" data-preview-image style="width:1700px; height:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hackorum-usefulness.png" data-preview-image style="width:1700px; height:auto; background:none; border:none;">
 
 *&mdash; Andrey Borodin, on `pgsql-hackers`*
 
@@ -1245,7 +1244,7 @@ docker run --rm -p 5432:5432 ghcr.io/hackorum-dev/postgres-patch:t47973
 psql -h localhost -U postgres
 ```
 
-<img src="img/hk-ci-banner.png" data-preview-image style="height:480px; width:auto; background:none; border:none; box-shadow:none;">
+<img class="screenshot-shadow" src="img/hk-ci-banner.png" data-preview-image style="height:480px; width:auto; background:none; border:none;">
 
 Note:
 
