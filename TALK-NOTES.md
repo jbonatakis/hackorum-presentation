@@ -89,7 +89,7 @@ to enlarge in the presentation. The pginbox screenshot shows the topic list.
 
 The three AI screenshots are now installed:
 
-1. **“In progress — AI topic summaries”** — `img/hackorum-summary.png`, the full summary UI.
+1. **“In progress: AI topic summaries”** — `img/hackorum-summary.png`, the full summary UI.
 2. **“One summary, one real discussion”** — `img/overview.png`, the overview excerpt.
 3. **“Did we get it right?”** — `img/concern.png`, a concern with references to messages 19 and 20.
 

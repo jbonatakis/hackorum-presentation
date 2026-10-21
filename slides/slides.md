@@ -138,6 +138,49 @@
   margin-top: 0.4em;
 }
 
+.reveal .slides section.walkthrough-feature {
+  box-sizing: border-box;
+  height: 1080px;
+  padding-top: 110px;
+}
+
+.feature-spectrum {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 300px;
+  font-size: 24px;
+  line-height: 1.2;
+  color: #51466f;
+}
+
+.feature-spectrum-labels {
+  display: flex;
+  justify-content: space-between;
+}
+
+.feature-spectrum-track {
+  position: relative;
+  height: 5px;
+  margin: 16px 8px 0;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #c4b5fd, #653df4);
+}
+
+.feature-spectrum-track::after {
+  content: "";
+  position: absolute;
+  left: var(--spectrum-position);
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: #653df4;
+  box-shadow: 0 0 0 2px #653df4;
+  transform: translate(-50%, -50%);
+}
+
 .team-portraits {
   display: flex;
   justify-content: center;
@@ -310,7 +353,7 @@
 
 ### for Experts and Newcomers
 
-<p class="speakers">Jack Bonatakis <span class="org">Robin</span></p>
+<p class="speakers">Jack Bonatakis<br><span class="org">Robin</span></p>
 <p class="venue">PGConf.EU 2026 · Valencia · October 22nd · Audit 2</p>
 
 Note:
@@ -390,7 +433,7 @@ Note:
 <img src="img/mailing-list-overnight.png" alt="Jack's inbox showing technical Postgres mailing-list emails received overnight" data-preview-image>
 
 * **50+ deeply technical emails** waiting in my inbox
-* Try to understand them one by one — while more arrive
+* Try to understand them one by one, while more arrive
 * Or ignore them, and lose the reason I subscribed
 
 </div>
@@ -513,6 +556,13 @@ Note:
 * Let's start with finding a discussion as a Postgres user.
 ---
 
+<!-- .slide: class="walkthrough-feature" -->
+
+<div class="feature-spectrum" style="--spectrum-position:15%;" role="img" aria-label="User to hacker spectrum: closer to the user end">
+  <div class="feature-spectrum-labels" aria-hidden="true"><span>User</span><span>Hacker</span></div>
+  <div class="feature-spectrum-track" aria-hidden="true"></div>
+</div>
+
 ## Find a conversation worth following
 
 <div class="image-with-notes">
@@ -532,6 +582,13 @@ Note:
 * Open the index-prefetching example next. It's an existing example in this deck, not the thread that diagnosed the Robin incident.
 ---
 
+<!-- .slide: class="walkthrough-feature" -->
+
+<div class="feature-spectrum" style="--spectrum-position:25%;" role="img" aria-label="User to hacker spectrum: closer to the user end">
+  <div class="feature-spectrum-labels" aria-hidden="true"><span>User</span><span>Hacker</span></div>
+  <div class="feature-spectrum-track" aria-hidden="true"></div>
+</div>
+
 ## Read it as a conversation
 
 <img src="img/hk-thread.png" data-preview-image style="height:700px; width:auto; background:none; border:none; box-shadow:none;">
@@ -543,6 +600,13 @@ Note:
 * The screenshot is of index prefetching, a long-running discussion. I don't need to be an expert on that patch to see the reading problem: there's a lot of history here.
 * The sidebar also contains patch and review information. I'll return to that from the contributor perspective.
 ---
+
+<!-- .slide: class="walkthrough-feature" -->
+
+<div class="feature-spectrum" style="--spectrum-position:35%;" role="img" aria-label="User to hacker spectrum: between the user end and the middle">
+  <div class="feature-spectrum-labels" aria-hidden="true"><span>User</span><span>Hacker</span></div>
+  <div class="feature-spectrum-track" aria-hidden="true"></div>
+</div>
 
 ## Follow the branches of the discussion
 
@@ -564,6 +628,13 @@ Note:
 * It still takes reading to understand the argument. Remember that distinction; it is what the summary work later in the talk addresses.
 ---
 
+<!-- .slide: class="walkthrough-feature" -->
+
+<div class="feature-spectrum" style="--spectrum-position:35%;" role="img" aria-label="User to hacker spectrum: between the user end and the middle">
+  <div class="feature-spectrum-labels" aria-hidden="true"><span>User</span><span>Hacker</span></div>
+  <div class="feature-spectrum-track" aria-hidden="true"></div>
+</div>
+
 ## Come back when you have time
 
 * **Per-message** read tracking - not per-thread
@@ -578,6 +649,13 @@ Note:
 * That gets back to why I built pginbox: I want to choose when to read these discussions, without a queue growing in my personal inbox.
 * Now change perspectives. Suppose I've found something I can help with.
 ---
+
+<!-- .slide: class="walkthrough-feature" -->
+
+<div class="feature-spectrum" style="--spectrum-position:60%;" role="img" aria-label="User to hacker spectrum: just toward the hacker end of the middle">
+  <div class="feature-spectrum-labels" aria-hidden="true"><span>User</span><span>Hacker</span></div>
+  <div class="feature-spectrum-track" aria-hidden="true"></div>
+</div>
 
 ## Find a place to contribute
 
@@ -601,6 +679,13 @@ Note:
 * The screenshot is a captured example. Don't quote its counts as current measurements.
 ---
 
+<!-- .slide: class="walkthrough-feature" -->
+
+<div class="feature-spectrum" style="--spectrum-position:75%;" role="img" aria-label="User to hacker spectrum: closer to the hacker end">
+  <div class="feature-spectrum-labels" aria-hidden="true"><span>User</span><span>Hacker</span></div>
+  <div class="feature-spectrum-track" aria-hidden="true"></div>
+</div>
+
 ## Follow the patch as it changes
 
 <div class="cols">
@@ -621,6 +706,13 @@ Note:
 * This brings the relevant context together before I start working on the change.
 ---
 
+<!-- .slide: class="walkthrough-feature" -->
+
+<div class="feature-spectrum" style="--spectrum-position:80%;" role="img" aria-label="User to hacker spectrum: closer to the hacker end">
+  <div class="feature-spectrum-labels" aria-hidden="true"><span>User</span><span>Hacker</span></div>
+  <div class="feature-spectrum-track" aria-hidden="true"></div>
+</div>
+
 ## Check the build and test results
 
 <img src="img/hk-ci-dashboard.png" data-preview-image style="height:700px; width:auto; background:none; border:none; box-shadow:none;">
@@ -633,6 +725,13 @@ Note:
 * The screenshot is an earlier snapshot. Avoid presenting its run counts as live activity.
 * The useful next step is getting from a conversation to something you can actually try.
 ---
+
+<!-- .slide: class="walkthrough-feature" -->
+
+<div class="feature-spectrum" style="--spectrum-position:85%;" role="img" aria-label="User to hacker spectrum: closer to the hacker end">
+  <div class="feature-spectrum-labels" aria-hidden="true"><span>User</span><span>Hacker</span></div>
+  <div class="feature-spectrum-track" aria-hidden="true"></div>
+</div>
 
 ## Try somebody's patch
 
@@ -652,6 +751,13 @@ Note:
 * A Postgres user may have a workload or reproduction that is useful here, even if they're not ready to review the code.
 * A command example is in backup. Only demonstrate it live if I've checked the image and prepared the environment before the talk.
 ---
+
+<!-- .slide: class="walkthrough-feature" -->
+
+<div class="feature-spectrum" style="--spectrum-position:90%;" role="img" aria-label="User to hacker spectrum: closer to the hacker end">
+  <div class="feature-spectrum-labels" aria-hidden="true"><span>User</span><span>Hacker</span></div>
+  <div class="feature-spectrum-track" aria-hidden="true"></div>
+</div>
 
 ## Reply to the list, from Hackorum
 
@@ -684,7 +790,7 @@ Note:
 * This is the transition from existing features to work running in my local environment.
 ---
 
-## In progress — AI topic summaries
+## In progress: AI topic summaries
 
 <p class="venue">Running locally · Bug fixes and quality evaluation in progress</p>
 
