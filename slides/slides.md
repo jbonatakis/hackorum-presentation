@@ -210,28 +210,52 @@
   image-rendering: pixelated;
 }
 
-.reveal-viewport.feedback-only {
+.questions-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 740px;
+  align-items: center;
+  gap: 60px;
+}
+
+.reveal .questions-feedback {
+  margin: 0;
+  padding-left: 40px;
+  border-left: 2px solid #d4d4d8;
+}
+
+.reveal .questions-feedback .feedback-qr {
+  display: block;
+  margin: 0 auto;
+}
+
+.questions-feedback figcaption {
+  font-size: 0.7em;
+  line-height: 1.5;
+}
+
+.reveal-viewport.feedback-only,
+.reveal-viewport.hide-corner-qr {
   background-image: none;
 }
 
-.summary-placeholder {
-  box-sizing: border-box;
-  min-height: 420px;
-  padding: 40px;
-  border: 3px dashed #653df4;
-  border-radius: 10px;
-  background: rgba(101, 61, 244, 0.05);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  font-size: 0.85em;
+.reveal img.summary-screenshot {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 580px;
+  margin: 30px auto;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.16);
 }
 
-.summary-placeholder span {
-  color: #6b6b75;
-  font-size: 0.8em;
+.reveal img.summary-excerpt {
+  width: 100%;
+}
+
+.reveal img.summary-full {
+  max-height: 700px;
 }
 
 .summary-example > * {
@@ -664,17 +688,12 @@ Note:
 
 <p class="venue">Running locally · Bug fixes and quality evaluation in progress</p>
 
-<div class="summary-placeholder">
-  <strong>Screenshot: topic summary in Hackorum</strong>
-  <span>Show the real local UI with the topic title and readable summary text.</span>
-</div>
-
-* A starting point for reading the original conversation
+<img class="summary-screenshot summary-full" src="img/hackorum-summary.png" alt="AI topic summary of a discussion about invalidating stale replication slots, with message references" data-preview-image>
 
 Note:
 
 * **About two minutes:** This works locally today. I'm working through bugs and trying to decide where the line of “good enough” is.
-* **Prepare:** Replace the placeholder with the real UI. If a summary of the earlier index-prefetching example is useful, use it; otherwise introduce the chosen thread plainly.
+* This example summarizes a discussion about invalidating stale replication slots based on transaction-ID age. Introduce it as a different thread from the earlier walkthrough.
 * Explain what the topic is about, then show where the summary lives and what a reader sees.
 * Pick one useful piece of context in the actual output. Explain what it helps you understand or which part of the conversation it helps you read next.
 * Don't imply the feature is deployed, or promise behaviour that isn't present in the local build.
@@ -682,36 +701,23 @@ Note:
 
 ## One summary, one real discussion
 
-<div class="summary-placeholder">
-  <strong>Screenshot: a readable summary excerpt</strong>
-  <span>Choose one proposal, disagreement, or open question from the actual output.</span>
-</div>
-
-* What would I understand after reading this?
-* Which original messages would I read next?
+<img class="summary-screenshot summary-excerpt" src="img/overview.png" alt="Summary overview describing the replication-slot invalidation proposal and its revisions, with references to original messages" data-preview-image>
 
 Note:
 
 * **About two minutes:** Stay with the same thread. Show a short excerpt at a size the room can read.
 * Give enough background to interpret it. Then walk through what this particular output gets across: the proposal, a disagreement, or something still unresolved.
 * Explain the next reading step it suggests. This is the practical value: helping me choose where to spend my attention.
-* **Prepare:** Write the example-specific explanation after selecting the screenshot. We haven't supplied an output yet, so this draft deliberately does not invent a summary or an evaluation result.
+* Point out the overview and its message references. Explain which original message you would read next to check or explore the proposal.
 ---
 
-## What counts as good enough?
+## Did we get it right?
 
-<div class="cols summary-example">
-
-<div class="summary-placeholder">
-  <strong>Screenshot: one claim, in context</strong>
-  <span>A summary excerpt beside the source message or messages needed to judge it.</span>
-</div>
+<img class="summary-screenshot summary-excerpt" src="img/concern.png" alt="Summary excerpt describing a concern about choosing an XID-based cutoff, with references to messages 19 and 20" data-preview-image>
 
 * Does it preserve **disagreement and uncertainty**?
 * Does it distinguish a **proposal from a decision**?
 * Can a reader **check it against the discussion**?
-
-</div>
 
 > What would you need to trust it to get you oriented?
 <!-- .element: class="highlight-box" -->
@@ -720,7 +726,7 @@ Note:
 
 * **About three minutes, including a pause for the audience to read the example.**
 * A summary can sound convincing and still leave someone with the wrong understanding. A suggestion can turn into an apparent decision; one person's objection can sound like a community consensus.
-* **Prepare:** Put an actual summary excerpt beside the source message or messages needed to evaluate it. This can be assembled for the slide and doesn't assert that the UI already provides source links.
+* The excerpt describes a concern about choosing an XID-based cutoff and cites messages 19 and 20. Use those source messages when evaluating whether it represents the discussion fairly; the excerpt alone doesn't establish accuracy.
 * Work through one concrete judgment: what is captured accurately, what is missing, and what I would want to change. A nuanced example is enough; don't manufacture a failure.
 * These questions are my evaluation criteria, not claims that every generated summary already meets them.
 * Clearly identifying generated content and letting people verify it against the discussion matter to the reading experience.
@@ -762,6 +768,8 @@ Note:
 * Give each idea a short example, then focus on the shared question: how do we make this useful without creating another queue of maintenance work for the same busy contributors?
 ---
 
+<!-- .slide: data-state="hide-corner-qr" data-background-color="#ffffff" -->
+
 ## Follow a conversation. Tell us what gets in the way.
 
 * **Use it:** [hackorum.dev](https://hackorum.dev)
@@ -785,21 +793,24 @@ Note:
 
 ## Questions?
 
-<div class="cols">
+<div class="questions-layout">
 
 <div>
 
-### Jack Bonatakis · Robin
+### Jack Bonatakis
 
 [hackorum.dev](https://hackorum.dev)
 
 [github.com/hackorum-dev/hackorum](https://github.com/hackorum-dev/hackorum)
 
-**How was the talk? Scan to leave feedback.**
+<p style="font-size:0.7em; line-height:1.5; margin-top:40px;">Thanks to <strong>Kai</strong> for inviting me to join this talk, <strong>Zsolt</strong> for all his great work on Hackorum, and the whole <strong>Percona team</strong> for their support.</p>
 
 </div>
 
-<img src="img/talk-feedback-qr.png" class="feedback-qr" alt="QR code for feedback on this talk">
+<figure class="questions-feedback">
+  <img src="img/talk-feedback-qr.png" class="feedback-qr" alt="QR code for feedback on this talk">
+  <figcaption><strong>How was the talk?</strong><br>Scan to leave feedback.</figcaption>
+</figure>
 
 </div>
 

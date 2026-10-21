@@ -41,8 +41,7 @@ perspective. Allow about 30 seconds within the existing opening allocation.
 
 The prepared talk targets **38 minutes**, leaving **12 minutes for questions and
 timing variation**. These are rehearsal budgets, not measured speaking durations.
-The AI allocation includes time to read and discuss the actual output; it cannot
-be filled by reading the placeholder text.
+The AI allocation includes time to read and discuss the actual output.
 
 The story is: an operational problem made Jack curious about Postgres; the lists
 were hard to keep up with in a personal inbox; pginbox led to collaborating on
@@ -82,22 +81,22 @@ growth, rather than claiming storage can never be reduced. Google documents both
 [automatic increases](https://docs.cloud.google.com/sql/docs/postgres/instance-settings)
 and a separate [storage shrink operation](https://docs.cloud.google.com/sql/docs/postgres/shrink-instance-storage-capacity).
 
-## Assets still needed
+## Screenshot assets
 
 The overnight-inbox and pginbox screenshots are now installed as
 `img/mailing-list-overnight.png` and `img/pginbox-overnight.png`. Both can be clicked
 to enlarge in the presentation. The pginbox screenshot shows the topic list.
 
-Three screenshot placeholders remain:
+The three AI screenshots are now installed:
 
-1. **“In progress — AI topic summaries”** — the working local UI.
-2. **“One summary, one real discussion”** — a readable excerpt from the same topic.
-3. **“What counts as good enough?”** — a summary claim beside the source messages needed to judge it.
+1. **“In progress — AI topic summaries”** — `img/hackorum-summary.png`, the full summary UI.
+2. **“One summary, one real discussion”** — `img/overview.png`, the overview excerpt.
+3. **“Did we get it right?”** — `img/concern.png`, a concern with references to messages 19 and 20.
 
-The AI examples can come from one thread. Prefer the walkthrough's index-prefetching
-topic if its output is useful; otherwise introduce another topic explicitly.
-The evaluation slide can be assembled from separate crops. It does not assert
-that the application already has citation or source-comparison UI.
+These examples concern invalidating stale replication slots based on transaction-ID
+age. Introduce this thread separately from the earlier walkthrough. All three
+screenshots can be clicked to enlarge. Check the cited source messages before
+making claims about the summary's accuracy.
 
 Once the examples are chosen, replace the preparation prompts with the specific
 point to demonstrate: what the output captures, what needs checking, and what
