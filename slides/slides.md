@@ -688,6 +688,8 @@ Note:
 
 <p class="venue">Running locally · Bug fixes and quality evaluation in progress</p>
 
+<p style="font-size:0.7em;"><strong>Topic:</strong> <a href="https://hackorum.dev/topics/52309" target="_blank" rel="noopener noreferrer">Introduce XID age based replication slot invalidation</a></p>
+
 <img class="summary-screenshot summary-full" src="img/hackorum-summary.png" alt="AI topic summary of a discussion about invalidating stale replication slots, with message references" data-preview-image>
 
 Note:
