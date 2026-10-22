@@ -353,7 +353,7 @@
 ### for Experts and Newcomers
 
 <p class="speakers">Jack Bonatakis<br><span class="org">Robin</span></p>
-<p class="venue">PGConf.EU 2026 · Valencia · October 22nd · Audit 2</p>
+<p class="venue">PGConf.EU 2026 · Valencia · October 22nd · Auditorium 2</p>
 
 Note:
 
