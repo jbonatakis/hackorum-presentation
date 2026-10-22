@@ -376,7 +376,7 @@ Note:
 
 ## I'm Jack
 
-* **Principal Engineer at Robin**
+* Principal Engineer at Robin
 * A Postgres user who got curious about how Postgres gets *built*
 
 Note:
@@ -598,6 +598,23 @@ Note:
 * Start with the title and the messages. This is the actual conversation people had on the mailing list.
 * The screenshot is of index prefetching, a long-running discussion. I don't need to be an expert on that patch to see the reading problem: there's a lot of history here.
 * The sidebar also contains patch and review information. I'll return to that from the contributor perspective.
+---
+
+<!-- .slide: class="walkthrough-feature" -->
+
+<div class="feature-spectrum" style="--spectrum-position:30%;" role="img" aria-label="User to hacker spectrum: between the user end and the middle">
+  <div class="feature-spectrum-labels" aria-hidden="true"><span>User</span><span>Hacker</span></div>
+  <div class="feature-spectrum-track" aria-hidden="true"></div>
+</div>
+
+## Team notes
+
+<img class="screenshot-shadow" src="img/hk-note.png" data-preview-image style="height:700px; width:auto; background:none; border:none;">
+
+Note:
+
+* Show the note attached to the topic and the mention/tag workflow.
+* This is a place to discuss how colleagues can keep context together.
 ---
 
 <!-- .slide: class="walkthrough-feature" -->
@@ -906,6 +923,8 @@ Note:
 
 ### Jack Bonatakis
 
+[jack@bonatak.is](mailto:jack@bonatak.is)
+
 [hackorum.dev](https://hackorum.dev)
 
 [github.com/hackorum-dev/hackorum](https://github.com/hackorum-dev/hackorum)
@@ -1156,16 +1175,6 @@ Note:
 
 * Show the profile and multiple aliases. The figures are from the captured example.
 * Avoid inferring contribution quality from a single metric.
----
-
-## Backup: Team notes
-
-<img class="screenshot-shadow" src="img/hk-note.png" data-preview-image style="height:800px; width:auto; background:none; border:none;">
-
-Note:
-
-* Show the note attached to the topic and the mention/tag workflow.
-* This is a place to discuss how colleagues can keep context together.
 ---
 
 ## Backup: Community reports
